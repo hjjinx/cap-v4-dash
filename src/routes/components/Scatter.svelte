@@ -16,7 +16,7 @@
   let loading = true;
   export let data: any[];
   let points: any[] = [];
-  let minX = 0;
+  let minX = -1;
   let maxX = 1;
   let minY = 0;
   let maxY = 0;
@@ -28,7 +28,7 @@
     data.forEach((position) => {
       const { x, y } = getPositionXY(position, $prices);
       // filtering out outliers
-      if (!(x > 0.01 && x < 1 && y > 10)) return;
+      if (!(x > -1 && x < 1 && y > 10)) return;
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
       points.push({
@@ -84,7 +84,7 @@
         {activePoint.p.isLong ? "drops" : "rises"}
       </span>
       by
-      <span style="color: white;">{(activePoint.x * 100).toFixed(2)}%</span> at
+      <span style="color: white;">{(Math.abs(activePoint.x) * 100).toFixed(2)}%</span> at
       <span style="color: white;"
         >{activePoint.p.liquidationPrice.toFixed(2)}</span
       >
@@ -161,7 +161,7 @@
                 "$" + +(point.p.price / getPriceDenominator(ETH)).toFixed(2),
               "Liquidation Price": "$" + +point.p.liquidationPrice.toFixed(2),
               "Mark Price": "$" + +$prices[point.p.market][0].toFixed(2),
-              "Price move for liquidation": `${point.p.isLong ? "-" : ""}${(
+              "Price move for liquidation": `${(
                 point.x * 100
               ).toFixed(2)}%`,
               "Current UPL": `${

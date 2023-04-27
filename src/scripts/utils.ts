@@ -93,7 +93,6 @@ export function priceTickFormatter(num: number) {
 export const getPositionXY = (position: any, prices: any) => {
   return {
     x:
-      (position.isLong ? -1 : 1) *
       +(
         (position.liquidationPrice - prices[position.market][0]) /
         prices[position.market][0]
