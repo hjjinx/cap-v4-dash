@@ -8,12 +8,15 @@
   import Home from './components/Home.svelte';
   import Positions from './Positions.svelte';
   import { getPrices } from '../scripts/utils';
-
+  import { dev } from '$app/environment';
+  import { inject } from '@vercel/analytics';
+ 
   /**
    * @type {any[]}
    */
   const intervals = []
   onMount(async () => {
+    inject({ mode: dev ? 'development' : 'production' });
     getPrices()
     intervals.push(setInterval(() => {
       getPrices()
