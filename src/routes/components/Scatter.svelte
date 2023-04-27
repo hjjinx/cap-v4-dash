@@ -156,7 +156,7 @@
               Size:
                 (point.p.asset == ETH ? "Ξ" : "$") +
                 +(point.p.size / getPriceDenominator(point.p.asset)).toFixed(2),
-                "Leverage": point.p.leverage,
+                "Leverage": point.p.leverage.toFixed(2),
               "Opening Price":
                 "$" + +(point.p.price / getPriceDenominator(ETH)).toFixed(2),
               "Liquidation Price": "$" + +point.p.liquidationPrice.toFixed(2),

@@ -119,7 +119,7 @@
               Size:
                 (position.asset == ETH ? "Ξ" : "$") +
                 +(position.size / getPriceDenominator(position.asset)).toFixed(2),
-                "Leverage": position.leverage,
+                "Leverage": position.leverage.toFixed(2),
               "Opening Price":
                 "$" + +(position.price / getPriceDenominator(ETH)).toFixed(2),
               "Liquidation Price": "$" + +position.liquidationPrice.toFixed(2),
