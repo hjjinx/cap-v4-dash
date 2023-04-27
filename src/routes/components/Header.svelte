@@ -5,7 +5,7 @@
   <div class="inner">
     <div class="left">
       <a class="logo" href="/"> <h1>🧢</h1> </a>
-      <!-- <a class={"link active"} href="#/positions">Positions</a> -->
+      <a class={"link"} href="#/positions">Positions</a>
     </div>
   </div>
 </header>

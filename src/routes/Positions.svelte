@@ -18,20 +18,20 @@
    */
   let data = [];
   onMount(async () => {
+    const updateUPLs = (_prices) => {
+      calculateUPLs(data, _prices)
+      loading = false;
+    }
     data = await getPositions()
     changeSort('market')
     sortBy = 'market'
     if ($prices['ETH-USD']) updateUPLs($prices)
+    prices.subscribe(_prices => {
+      if (_prices['ETH-USD']) updateUPLs(_prices)
+    })
   });
   
-  prices.subscribe(_prices => {
-    if (_prices['ETH-USD']) updateUPLs(_prices)
-  })
   
-  const updateUPLs = (_prices) => {
-    calculateUPLs(data, _prices)
-    loading = false;
-  }
   
   $: changeSort = (/** @type {string} */ _sortBy) => {
     if (sortBy == _sortBy) {
