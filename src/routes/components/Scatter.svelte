@@ -24,9 +24,10 @@
   let height = 200;
   const padding = { top: 20, right: 15, bottom: 20, left: 25 };
 
-  onMount(async () => {
+  const fetchData = (_prices: any[]) => {
+    points = []
     data.forEach((position) => {
-      const { x, y } = getPositionXY(position, $prices);
+      const { x, y } = getPositionXY(position, _prices);
       // filtering out outliers
       if (!(x > -1 && x < 1 && y > 10)) return;
       minY = Math.min(minY, y);
@@ -45,9 +46,17 @@
       .ticks(6);
     yTicks.shift();
     maxY = Math.max(maxY, yTicks[yTicks.length - 1]);
-
+    
     loading = false;
+  }
+
+  onMount(async () => {
+    fetchData($prices)
   });
+
+  prices.subscribe((_prices) => {
+    fetchData(_prices)
+  })
   $: xScale = scaleLinear()
     .domain([minX, maxX])
     .range([padding.left, width - padding.right]);
