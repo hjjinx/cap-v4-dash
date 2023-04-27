@@ -19,7 +19,7 @@ export const getPositions = async () => {
   positions = positions.map((p: any) => ({
     ...p,
     leverage: p.size / p.margin,
-    liquidationPrice: p.price / getPriceDenominator(ETH) + ((p.isLong ? -1 : 1) * (((p.margin / getPriceDenominator(p.asset))) * (p.price / getPriceDenominator(ETH))) / (p.size / getPriceDenominator(p.asset))),
+    liquidationPrice: p.price / getPriceDenominator(ETH) + ((p.isLong ? -1 : 1) * ((((p.margin * 99 / 100) / getPriceDenominator(p.asset))) * (p.price / getPriceDenominator(ETH))) / (p.size / getPriceDenominator(p.asset))),
   }))
 
   return positions;

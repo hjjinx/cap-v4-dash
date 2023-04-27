@@ -24,8 +24,6 @@ export function getUPL(position: any, latestPrice: any) {
   if (latestPrice) {
     if (position.isLong) {
       // upl = size * (markPrice - openPrice) / openPrice
-      // -margin + fee = size * (liqPrice - openPrice) / openPrice
-      // ((-margin + size * 0.0005) * openPrice) / size + openPrice = liqPrice
       upl =
         ((position.size / getPriceDenominator(position.asset)) *
           (latestPrice * 1 - (position.price / getPriceDenominator(ETH)) * 1)) /
