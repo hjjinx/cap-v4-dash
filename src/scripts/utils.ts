@@ -96,7 +96,7 @@ export const getPositionXY = (position: any, prices: any) => {
   return {
     x:
       (position.isLong ? -1 : 1) *
-      (
+      +(
         (position.liquidationPrice - prices[position.market][0]) /
         prices[position.market][0]
       ).toFixed(4),
@@ -111,7 +111,7 @@ export const hideModal = () => {
 export function formatForDisplay(amount: number, fix: number = 0) {
   amount = amount * 1;
   if (!amount || isNaN(amount)) return 0;
-  if (!fix && (amount * 1).toFixed(6) * 1 == Math.round(amount * 1))
+  if (!fix && +(amount * 1).toFixed(6) * 1 == Math.round(amount * 1))
     return Math.round(amount);
   if (fix) return (amount * 1).toFixed(fix);
   if (amount * 1 >= 10000 || amount * 1 <= -10000) {
@@ -128,7 +128,6 @@ export function formatForDisplay(amount: number, fix: number = 0) {
 }
 
 export function loadRoute(path: string) {
-  console.log(path)
   if (!path || path == "/" || path.includes("/home")) {
     component.set(Home);
   } else if (path.includes("/positions")) {

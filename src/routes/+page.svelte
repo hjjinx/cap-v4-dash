@@ -11,7 +11,6 @@
 
   const intervals: any[] = []
   onMount(async () => {
-    // inject({ mode: dev ? 'development' : 'production' });
     await getPrices()
     loading = false
     intervals.push(setInterval(() => {

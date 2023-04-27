@@ -28,7 +28,6 @@
     data.forEach((position) => {
       const { x, y } = getPositionXY(position, $prices);
       // filtering out outliers
-      console.log({ x, y });
       if (!(x > 0.01 && x < 1 && y > 10)) return;
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
@@ -143,7 +142,6 @@
         <circle
           on:mouseenter={() => {
             activePoint = point;
-            console.log(activePoint.p);
           }}
           on:click={() => {
             const p = {

@@ -105,7 +105,8 @@
 		<div class='modal-header'>
 			<div class='top'>
 				<div class='modal-title'>{title}</div>
-				<a class='close' on:click={hideModal} href='#'>
+				<!-- svelte-ignore a11y-missing-attribute -->
+				<a class='close' on:click={hideModal}>
 					{#if doneButton}Done{:else}{@html XMARK_ICON}{/if}
 				</a>
 			</div>

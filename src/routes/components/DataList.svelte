@@ -4,7 +4,6 @@
 
 	export let data : any;
 	export let isSmall = false;
-  console.log(data)
 </script>
 
 <style>

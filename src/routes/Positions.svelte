@@ -5,7 +5,7 @@
   import { getPositions } from "../scripts/web3";
   import { calculateUPLs, getPriceDenominator, numberWithCommas, priceFormatter } from "../scripts/utils";
   import { ETH } from "../scripts/constants";
-  import { prices } from "../scripts/stores";
+  import { prices, showPositionInfoModal } from "../scripts/stores";
 
   let loading = true;
   /**
@@ -46,7 +46,6 @@
         data = data.sort((a, b) => b[_sortBy] - a[_sortBy]);
       }
     }
-    console.log(data)
   };
 
 </script>
@@ -107,6 +106,38 @@
         <div
           class="trade"
           data-intercept="true"
+          on:click|stopPropagation={() => {
+            const p = {
+              User: position.user,
+              Market: position.market,
+              "Is Long": position.isLong ? "Yes" : "No",
+              Margin:
+                (position.asset == ETH ? "Ξ" : "$") +
+                +(position.margin / getPriceDenominator(position.asset)).toFixed(
+                  2
+                ),
+              Size:
+                (position.asset == ETH ? "Ξ" : "$") +
+                +(position.size / getPriceDenominator(position.asset)).toFixed(2),
+                "Leverage": position.leverage,
+              "Opening Price":
+                "$" + +(position.price / getPriceDenominator(ETH)).toFixed(2),
+              "Liquidation Price": "$" + +position.liquidationPrice.toFixed(2),
+              "Mark Price": "$" + +$prices[position.market][0].toFixed(2),
+              "Price move for liquidation": `${position.isLong ? "-" : ""}${(
+                (position.isLong ? -1 : 1) *
+                +(
+                  (position.liquidationPrice - $prices[position.market][0]) /
+                  $prices[position.market][0]
+                ).toFixed(4) * 100
+              ).toFixed(2)}%`,
+              "Current UPL": `${
+                position.asset == ETH ? "Ξ" : "$"
+              }${position.upl.toFixed(2)}`,
+              "UPL Percent": `${Number(position.uplPercent).toFixed(2)}%`,
+            };
+            showPositionInfoModal.set(p);
+          }}
         >
           <div class="column column-product">
             {#if position.isLong}<span class="pos">↑</span>{:else}<span
