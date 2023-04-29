@@ -7,6 +7,7 @@ import {
 import { component, prices, showPositionInfoModal } from "./stores";
 import Home from '../routes/Home.svelte';
 import Positions from '../routes/Positions.svelte';
+import User from '../routes/User.svelte';
 
 export function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -63,6 +64,27 @@ export function calculateUPLs(_positions: any[], prices: any[]) {
       (+position.margin / getPriceDenominator(position.asset))
     ).toFixed(2);
   }
+}
+
+export const addDollarInfoToData = (_positions: any[], prices: any[]) => {
+  const newData = []
+  for (const position of _positions) {
+    const newPos = {...position}
+    newPos.leverage = newPos.size / newPos.margin;
+    const upl = getUPL(newPos, prices[newPos.market][0]);
+    if (upl == undefined) continue;
+    newPos.markPrice = prices[newPos.market][0];
+    newPos.marginInDollars =
+      newPos.asset == ETH
+        ? (newPos.margin * prices["ETH-USD"][0]) / getPriceDenominator(ETH)
+        : newPos.margin / getPriceDenominator(USDC);
+    newPos.sizeInDollars =
+      newPos.asset == ETH
+        ? (newPos.size * prices["ETH-USD"][0]) / getPriceDenominator(ETH)
+        : newPos.size / getPriceDenominator(USDC);
+    newData.push(newPos);
+  }
+  return newData;
 }
 
 export async function getPrices() {
@@ -129,5 +151,20 @@ export function loadRoute(path: string) {
     component.set(Home);
   } else if (path.includes("/positions")) {
     component.set(Positions);
+  } else if (path.includes("/user")) {
+    component.set(User);
+  }
+}
+
+export const getOrderType = (orderType: number) => {
+  switch (orderType) {
+    case 0:
+      return 'Market'
+    case 1:
+      return 'Limit'
+    case 2:
+      return 'Stop'
+    default:
+     return 'Market'
   }
 }

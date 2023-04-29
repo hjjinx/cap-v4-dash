@@ -1,4 +1,6 @@
 <script lang='ts'>
+  import { showPositionInfoModal } from '../../scripts/stores';
+
 
 	import { formatForDisplay } from '../../scripts/utils'
 
@@ -13,6 +15,12 @@
 	export let hasSemiPadding = false;
 	export let fullOpacityLabel = false;
 
+  function onClickValue(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement; }) {
+    if (isClickable) {
+			window.location.href = `#/user/${value}`; 
+			showPositionInfoModal.set(null)
+		}
+  }
 </script>
 
 <style>
@@ -67,7 +75,7 @@
 <div class='flex-row' class:padded={hasPadding} class:semipadded={hasSemiPadding} class:noPadding={noPadding}>
 	<div class='label' class:fullOpacity={fullOpacityLabel} class:hasNote={note != false}>{label}</div>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class={`value`} on:click|stopPropagation={() => isClickable ? window.location.href = `https://debank.com/profile/${value}` : null} class:clickable={isClickable} class:secondary={isSecondaryColor}>
+	<div class={`value`} on:click|stopPropagation={onClickValue} class:clickable={isClickable} class:secondary={isSecondaryColor}>
 		{#if formatValue} 
 			{formatForDisplay(value)}
 		{:else}
