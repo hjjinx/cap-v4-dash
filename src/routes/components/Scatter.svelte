@@ -95,9 +95,9 @@
 {:else}
   {#if activePoint == 0}
     <h3>
-      <span class="button" on:click={zoomOut} title='Zoom Out'>-</span> 
+      <span class="button" on:click={zoomOut} title='Zoom Out' class:inactive={minX <= -1}>-</span> 
       Liquidation Map for all Markets 
-      <span class="button" on:click={zoomIn} title='Zoom In'>+</span>
+      <span class="button" on:click={zoomIn} title='Zoom In' class:inactive={minX > -0.2}>+</span>
     </h3>
     
   {:else}
@@ -219,10 +219,14 @@
     width: 100%;
     height: 300px;
   }
-.button {
-  color: white;
-  cursor: pointer;
-}
+  .button {
+    color: white;
+    cursor: pointer;
+  }
+  .button.inactive {
+    color: var(--text-100);
+    cursor: not-allowed;
+  }
   .chart {
     width: 100%;
     max-width: 80vh;
