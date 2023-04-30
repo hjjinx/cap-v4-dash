@@ -100,7 +100,7 @@ export const ARBISCAN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlin
 </svg>`
 
 export const SHARE_ICON = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-viewBox="0 0 512 512" style="enable-background:new 0 0 512 512; height: 25px" xml:space="preserve" fill='var(--primary)'>
+viewBox="0 0 512 512" style="enable-background:new 0 0 512 512; height: 20px" xml:space="preserve" fill='var(--primary)'>
 <g>
 <g>
  <path d="M418.056,162.056c-30.616,0-57.736,14.712-74.88,37.384L184.512,118.6c2.136-7.872,3.376-16.104,3.376-24.656

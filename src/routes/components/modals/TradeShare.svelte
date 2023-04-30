@@ -5,6 +5,7 @@
   import { SPINNER_ICON, DOWNLOAD_ICON, CAP_LOGO } from "../../../scripts/icons";
   import { getUPL, formatPnl, numberWithCommas, priceFormatter, getPriceDenominator } from "../../../scripts/utils";
   import { prices } from "../../../scripts/stores";
+  import bg from '../../../images/banner-background.jpg';
 
   export let data: any;
   let imageData: any;
@@ -42,6 +43,9 @@
   <body>
     <div id="canvas">
       <div class="container" id="canvas-content">
+        <div class='bg-container'>
+          <img src={bg} class='bg' alt=''/>
+        </div>
         <div class="cap-logo">
           {@html CAP_LOGO}
           <span class="cap-logo-text">CAP Protocol</span>
@@ -102,7 +106,18 @@
     z-index: -1;
     justify-content: center;
   }
-  .container {
+  .bg-container {
+    width: 948px; 
+    height: 1422px; 
+    position: absolute; 
+    z-index: -1; 
+    scale: 1.2
+  }
+  .bg-container .bg {
+    width: 948px; 
+    height: 1422px;
+  }
+.container {
     width: 948px;
     height: 1422px;
     padding: 60px 50px;
@@ -110,7 +125,6 @@
     flex: 0 0 100%;
     flex-direction: column;
     justify-content: space-between;
-    background-color: black;
     margin-right: -150px;
   }
   .cap-logo {
@@ -188,6 +202,7 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     flex-wrap: wrap;
+    font-size: 36px;
   }
   .loader-container {
     height: 85vh;
