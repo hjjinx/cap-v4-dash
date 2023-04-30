@@ -86,7 +86,9 @@
             <a on:click={() => activeTab = 'history'} class:active={activeTab == 'history'}>History<span class="count">{history.length}</span></a>
           </div>
         </div>
-        <DataComp data={dataSwitch()} dataType={activeTab}/>
+        <div class='rows-container'>
+          <DataComp data={dataSwitch()} dataType={activeTab}/>
+        </div>
       </div>
     {/if}
   {/if}
@@ -101,7 +103,7 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 0 40px;
+    padding: 0 2rem;
   }
   .user-page-container .header .right {
     display: flex;
@@ -114,6 +116,7 @@
   .user-page-container .address {
     color: var(--text200);
     margin: 0px 0 2px;
+    overflow-wrap: anywhere;
   }
   .user-page-container .icon {
     display: inline-block;
@@ -163,5 +166,15 @@
   }
   .history-container {
     margin-top: 25px;
+  }
+
+  @media (max-width: 780px) {
+    .user-page-container .header {
+      padding: 0 0.5rem;
+    }
+    .rows-container {
+      max-width: 100%;
+      overflow-x: scroll;
+    }
   }
 </style>

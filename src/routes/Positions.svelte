@@ -29,5 +29,14 @@
     <center><h1 class="loading-title">Fetching Sorted Data</h1></center>
   </div>
 {:else}
-  <DataComp data={data}/>
+  <div class="positions-container">
+    <DataComp data={data}/>
+  </div>
 {/if}
+
+<style>
+  .positions-container {
+    max-width: 100%;
+    overflow-x: scroll;
+  }
+</style>

@@ -112,4 +112,21 @@
   :global(.neg) {
     color: var(--red);
   }
+  :global(::-webkit-scrollbar) {
+    width: 0px;
+    height: 5px;
+    background: transparent;
+  }
+  :global(::-webkit-scrollbar-thumb) {
+    border-radius: 6px;
+    background-color: var(--layer100);
+  }
+  :global(::-webkit-scrollbar-track) {
+    background-color: transparent;
+    border-radius: 6px;
+  }
+  :global(::-webkit-scrollbar) {
+    width: 0px;
+    background: transparent;
+  }
 </style>

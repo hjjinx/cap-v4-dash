@@ -235,6 +235,10 @@
 <style>
   .history {
     background-color: var(--eerie-black);
+    min-width: 800px;
+  }
+  .trades-list {
+    min-width: 800px;
   }
   .empty {
     background: var(--rich-black-fogra);

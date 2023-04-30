@@ -17,8 +17,8 @@
   let loading = true;
   export let data: any[];
   let points: any[] = [];
-  let minX = -1;
-  let maxX = 1;
+  let minX = -0.3;
+  let maxX = 0.3;
   let minY = 0;
   let maxY = 0;
   let width = 500;
