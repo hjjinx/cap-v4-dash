@@ -1,3 +1,56 @@
+export const CAP_LOGO = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:serif="http://www.serif.com/" width="100%" height="100%" viewBox="0 0 300 300" version="1.1" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2; width: 50px;height: 50px;"><script xmlns="" type="text/javascript"/>
+<g transform="matrix(1,0,0,1,-300,-1800)">
+		<g transform="matrix(1,0,0,1,-5.68434e-14,-300)">
+				<path d="M525,2325L600,2325C600,2366.23 566.655,2399.74 525.485,2400L525,2400L525,2325Z" style="fill:rgb(40,167,42);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,-5.68434e-14,-300)">
+				<rect x="450" y="2325" width="75" height="75" style="fill:rgb(38,157,40);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,-5.68434e-14,-300)">
+				<rect x="375" y="2325" width="75" height="75" style="fill:rgb(28,115,29);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,-5.68434e-14,-300)">
+				<path d="M375,2325L375,2400L374.515,2400C333.345,2399.74 300,2366.23 300,2325L375,2325Z" style="fill:rgb(25,105,27);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="300" y="2175" width="75" height="75" style="fill:rgb(33,136,34);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="375" y="2250" width="75" height="75" style="fill:rgb(35,146,37);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="450" y="2250" width="75" height="75" style="fill:rgb(43,178,45);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="525" y="2175" width="75" height="75" style="fill:rgb(81,216,83);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="300" y="2250" width="75" height="75" style="fill:rgb(30,125,32);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="525" y="2250" width="75" height="75" style="fill:rgb(71,214,73);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="450" y="2175" width="75" height="75" style="fill:rgb(60,211,63);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="375" y="2175" width="75" height="75" style="fill:rgb(45,188,48);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="450" y="2100" width="75" height="75" style="fill:rgb(91,218,93);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<rect x="375" y="2100" width="75" height="75" style="fill:rgb(50,209,53);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<path d="M375,2100L375,2175L300,2175C300,2133.61 333.606,2100 375,2100Z" style="fill:rgb(48,199,50);"/>
+		</g>
+		<g transform="matrix(1,0,0,1,0,-300)">
+				<path d="M600,2175L525,2175L525,2100C566.232,2100 599.738,2133.35 599.998,2174.51C599.999,2174.68 600,2174.84 600,2175Z" style="fill:rgb(101,221,104);"/>
+		</g>
+</g>
+</svg>`
+
 export const SPINNER_ICON = `<svg viewBox="0 0 24 24" fill="none"><style>@keyframes rotate-center{0%{-webkit-transform:rotate(0);transform:rotate(0)}to{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}</style><g style="animation:rotate-center 1s cubic-bezier(.18,.89,.32,1.28) infinite both;transform-origin:center center"><circle cx="12" cy="12" r="8" stroke="rgb(55,55,55)" stroke-width="2"/><path d="M18.447 14.73a.53.53 0 00.233.68l.89.457a.48.48 0 00.66-.223A9 9 0 0016.551 4.22a.48.48 0 00-.667.205l-.456.89a.53.53 0 00.209.688 7.001 7.001 0 012.81 8.726z" fill="rgb(0,200,5)"/></g></svg>`;
 
 export const XMARK_ICON = `<svg viewBox="0 0 15.4859 15.4956">
@@ -45,3 +98,38 @@ export const ARBISCAN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlin
 <path class="st4-arb" d="M23.8,13.4l-2.1,0l-4.9,8l1.7,1L23.8,13.4z"/>
 <path class="st4-arb" d="M18.5,14.2c0.5-0.8,1.9-0.8,2.5-0.7l-4.8,7.7c-0.2-0.1-0.6-0.3-0.9-0.5c-0.4-0.2-0.5-0.2-0.5-0.5v-0.4  C15.9,18.2,18,15,18.5,14.2z"/>
 </svg>`
+
+export const SHARE_ICON = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+viewBox="0 0 512 512" style="enable-background:new 0 0 512 512; height: 25px" xml:space="preserve" fill='var(--primary)'>
+<g>
+<g>
+ <path d="M418.056,162.056c-30.616,0-57.736,14.712-74.88,37.384L184.512,118.6c2.136-7.872,3.376-16.104,3.376-24.656
+   C187.888,42.064,145.824,0,93.944,0S0,42.064,0,93.944c0,51.88,42.064,93.944,93.944,93.944c31.912,0,60.056-15.944,77.04-40.264
+   l157.44,80.216c-2.792,8.888-4.304,18.344-4.304,28.16c0,9.816,1.512,19.272,4.304,28.16l-157.44,80.224
+   c-16.976-24.32-45.128-40.272-77.04-40.272C42.064,324.112,0,366.176,0,418.056S42.064,512,93.944,512
+   s93.944-42.064,93.944-93.944c0-8.544-1.24-16.784-3.376-24.648l158.664-80.848c17.152,22.672,44.264,37.384,74.88,37.384
+   C469.936,349.944,512,307.88,512,256C512,204.112,469.936,162.056,418.056,162.056z M93.944,155.888
+   C59.784,155.888,32,128.096,32,93.944C32,59.784,59.784,32,93.944,32c34.152,0,61.944,27.784,61.944,61.944
+   C155.888,128.096,128.096,155.888,93.944,155.888z M93.944,480C59.784,480,32,452.216,32,418.056
+   c0-34.152,27.792-61.944,61.944-61.944c34.152,0,61.944,27.792,61.944,61.944C155.888,452.216,128.096,480,93.944,480z
+    M418.056,317.944c-34.152,0-61.944-27.792-61.944-61.944c0-34.16,27.792-61.944,61.944-61.944
+   C452.216,194.056,480,221.84,480,256C480,290.152,452.216,317.944,418.056,317.944z"/>
+</g>
+</g>
+</svg>`
+
+export const DOWNLOAD_ICON = `<svg style="height: 25px; width: 25px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+viewBox="0 0 490 490" style="enable-background:new 0 0 490 490;" xml:space="preserve">
+<g>
+<g>
+ <g>
+   <path d="M245,0c-9.5,0-17.2,7.7-17.2,17.2v331.2L169,289.6c-6.7-6.7-17.6-6.7-24.3,0s-6.7,17.6,0,24.3l88.1,88.1
+     c3.3,3.3,7.7,5,12.1,5c4.4,0,8.8-1.7,12.1-5l88.1-88.1c6.7-6.7,6.7-17.6,0-24.3c-6.7-6.7-17.6-6.7-24.3,0L262,348.4V17.1
+     C262.1,7.6,254.5,0,245,0z"/>
+   <path d="M462.1,472.9v-99.7c0-9.5-7.7-17.2-17.2-17.2s-17.2,7.7-17.2,17.2v82.6H62.2v-82.6c0-9.5-7.7-17.2-17.1-17.2
+     s-17.2,7.7-17.2,17.2v99.7c0,9.5,7.7,17.1,17.2,17.1h399.8C454.4,490,462.1,482.4,462.1,472.9z"/>
+ </g>
+</g>
+</g>
+</svg>
+`

@@ -21,8 +21,10 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/dom-to-image": "^2.6.4",
 		"@vercel/analytics": "^1.0.0",
 		"d3-scale": "^4.0.2",
+		"dom-to-image": "^2.6.0",
 		"svelte-drag": "^3.1.0",
 		"web3": "^1.9.0"
 	}

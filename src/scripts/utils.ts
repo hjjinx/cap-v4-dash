@@ -4,7 +4,7 @@ import {
   USDC,
   USDC_PRICE_DENOMINATOR,
 } from "./constants";
-import { component, prices, showPositionInfoModal } from "./stores";
+import { component, prices, showPositionInfoModal, sharePositionModal } from "./stores";
 import Home from '../routes/Home.svelte';
 import Positions from '../routes/Positions.svelte';
 import User from '../routes/User.svelte';
@@ -26,15 +26,15 @@ export function getUPL(position: any, latestPrice: any) {
     if (position.isLong) {
       // upl = size * (markPrice - openPrice) / openPrice
       upl =
-        ((position.size / getPriceDenominator(position.asset)) *
-          (latestPrice * 1 - (position.price / getPriceDenominator(ETH)) * 1)) /
-        (position.price / getPriceDenominator(ETH));
+        ((+position.size / getPriceDenominator(position.asset)) *
+          (latestPrice * 1 - (+position.price / getPriceDenominator(ETH)) * 1)) /
+        (+position.price / getPriceDenominator(ETH));
     } else {
       // size * (openPrice - markPrice) / openPrice
       upl =
-        ((position.size / getPriceDenominator(position.asset)) *
-          ((position.price / getPriceDenominator(ETH)) * 1 - latestPrice * 1)) /
-        (position.price / getPriceDenominator(ETH));
+        ((+position.size / getPriceDenominator(position.asset)) *
+          ((+position.price / getPriceDenominator(ETH)) * 1 - latestPrice * 1)) /
+        (+position.price / getPriceDenominator(ETH));
     }
     // TODO: Add interest
     // let interest = await getInterest(position);
@@ -125,6 +125,7 @@ export const getPositionXY = (position: any, prices: any) => {
 
 export const hideModal = () => {
   showPositionInfoModal.set(null);
+  sharePositionModal.set(null);
 };
 
 export function formatForDisplay(amount: number, fix: number = 0) {
@@ -167,4 +168,17 @@ export const getOrderType = (orderType: number) => {
     default:
      return 'Market'
   }
+}
+
+export function formatPnl(pnl: number, isPercent: boolean) {
+	let string = '';
+	if (pnl == undefined) return string;
+	if (pnl > 0) {
+		string += '+';
+	} else if (pnl > 0) {
+		string += '-';
+	}
+	string += formatForDisplay(pnl, isPercent ? 2 : 0) || 0;
+	if (isPercent) string += '%';
+	return string;
 }

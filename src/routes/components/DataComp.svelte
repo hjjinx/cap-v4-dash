@@ -3,7 +3,8 @@
   import { onMount } from "svelte";
   import { getOrderType, getPriceDenominator, numberWithCommas, priceFormatter } from "../../scripts/utils";
   import { ETH } from "../../scripts/constants";
-  import { prices, showPositionInfoModal } from "../../scripts/stores";
+  import { prices, sharePositionModal, showPositionInfoModal } from "../../scripts/stores";
+  import {SHARE_ICON} from '../../scripts/icons';
 
   let sortBy: string;
   let sortOrder = 'desc';
@@ -68,9 +69,12 @@
       >
       </div>
       <div
-        class="column column-liqprice"
+        class="column column-price"
       >
         Liq. Price (Estimated)
+      </div>
+      <div class='column column-liqprice'>
+        Share
       </div>
     {:else if dataType == 'orders'}
       <div class="column column-leverage" on:click={() => changeSort('leverage')}>
@@ -195,9 +199,14 @@
               {position.upl.toFixed(position.asset == ETH ? 2 : 0)}{position.asset == ETH ? 'Ξ' : '$'}
               <span class="pnl-percent">({position.uplPercent}%)</span>
             </div>
-            <div class="column column-liqprice" title={`${(position.liquidationPrice).toString()}$`}>
+            <div class="column column-price" title={`${(position.liquidationPrice).toString()}$`}>
               {numberWithCommas(position.liquidationPrice.toFixed(2)) || '--'}$
             </div>
+            <div class="column column-liqprice" title={`Share`}>
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <a on:click|stopPropagation={() => { sharePositionModal.set(position) }}>{@html SHARE_ICON}</a>
+            </div>
+
           {:else if dataType == 'orders'}
             <div class="column column-leverage">
               {#if position.isReduceOnly}
@@ -352,4 +361,9 @@
     position: relative;
     background-color: var(--eerie-black);
   }
+
+	a {
+		color: var(--primary);
+		text-decoration: none;
+	}
 </style>
