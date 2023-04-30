@@ -1,3 +1,4 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
   import { onMount } from "svelte";
   import { scaleLinear, scalePow } from "d3-scale";
@@ -29,7 +30,7 @@
     data.forEach((position) => {
       const { x, y } = getPositionXY(position, _prices);
       // filtering out outliers
-      if (!(x > -1 && x < 1 && y > 10)) return;
+      if (!(x > minX && x < maxX && y > 10)) return;
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
       points.push({
@@ -67,6 +68,21 @@
     .range([height - padding.bottom, padding.top]);
 
   $: yTicks = [];
+
+  $: zoomOut = () => {
+    if (minX > -1) {
+      minX -= 0.1
+      maxX += 0.1
+      fetchData($prices)
+    }
+  }
+  $: zoomIn = () => {
+    if (minX < -0.2) {
+      minX += 0.1
+      maxX -= 0.1
+      fetchData($prices)
+    }
+  }
 </script>
 
 {#if loading}
@@ -78,7 +94,12 @@
   </div>
 {:else}
   {#if activePoint == 0}
-    <h3>Liquidation Map for all Markets</h3>
+    <h3>
+      <span class="button" on:click={zoomOut} title='Zoom Out'>-</span> 
+      Liquidation Map for all Markets 
+      <span class="button" on:click={zoomIn} title='Zoom In'>+</span>
+    </h3>
+    
   {:else}
     <h3>
       <span class={activePoint.p.asset == ETH ? "eth" : "usdc"}
@@ -198,7 +219,10 @@
     width: 100%;
     height: 300px;
   }
-
+.button {
+  color: white;
+  cursor: pointer;
+}
   .chart {
     width: 100%;
     max-width: 80vh;
