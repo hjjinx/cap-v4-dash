@@ -166,7 +166,11 @@
             {position.market}
           </div>
           <div class="column column-price" title={(position.price / getPriceDenominator(position.asset)).toString()}>
-            {numberWithCommas(priceFormatter(position.price))}$
+            {#if position.orderType == 0}
+             -
+            {:else}
+              {numberWithCommas(priceFormatter(position.price))}$
+            {/if}
           </div>
           <div class="column column-margin" title={`${(position.marginInDollars).toString()}$`}>
             {numberWithCommas(
