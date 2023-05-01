@@ -70,6 +70,7 @@
     color: var(--text100);
     width: 85%;
     padding: 1rem;
+    border-radius: 5px;
   }
   @media (max-width: 780px) {
     .search-input-container input {

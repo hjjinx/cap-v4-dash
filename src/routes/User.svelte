@@ -18,13 +18,18 @@
   let history: any[] = []
   let totalFeeETH = 0;
   let totalFeeUSD = 0;
-  let firstTradeDate = ''
+  let firstTradeDate: string | null = ''
   let totalUPL = 0;
   onMount(async () => {
     let url = window.location.href.split('/')
     user = url[url.length - 1]
     if (user.endsWith('.eth')) {
-      const add = await resolveEns(user)
+      let add;
+      try {
+        add = await resolveEns(user)
+      } catch (err) {
+        console.log(err)
+      }
       if (typeof add == 'string') {
         user = add;
       }
@@ -51,8 +56,9 @@
     }, [0, 0])
     totalFeeETH = fee[0];
     totalFeeUSD = fee[1];
-    const _date = new Date(history.reduce((first, curr) => first = first > curr.blockTimestamp ? curr.blockTimestamp : first, new Date()) * 1000)
-    firstTradeDate = _date.toDateString().slice(3) + ' ' + _date.toLocaleTimeString()
+    const _date = new Date(history.reduce((first, curr) => first = first > curr.blockTimestamp ? curr.blockTimestamp : first, new Date().getTime() * 1000) * 1000)
+    if (String(_date) == 'Invalid Date') firstTradeDate = null
+    else firstTradeDate = _date.toDateString().slice(3) + ' ' + _date.toLocaleTimeString()
 
     totalUPL = positions.reduce((acc: number,curr: any) => acc + curr.uplInDollars, 0)
     loading = false
@@ -111,7 +117,11 @@
           in fees to the CAP protocol
         </div>
         <div>
-          - Started trading on CAP protocol on <span class="white">{firstTradeDate}</span>
+          {#if firstTradeDate == null}
+            - Has never traded on CAP
+          {:else}
+            - Started trading on CAP protocol on <span class="white">{firstTradeDate}</span>
+          {/if}
         </div>
         <div>
           - Current total UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(Number(totalUPL.toFixed(2)))}</span>
