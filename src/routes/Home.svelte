@@ -7,6 +7,7 @@
   import { calculateUPLs } from '../scripts/utils';
   
   let loading = true;
+  let address = ''
 
   let positionsData: any[] = [];
   onMount(async () => {
@@ -33,6 +34,11 @@
     <center><h1>Fetching Data</h1></center>
   </div>
 {:else}
+  <div class="search-input-container">
+    <input bind:value={address} placeholder="Search for any Address / ENS" on:keypress={(e) => {
+      if (e.code == 'Enter') window.location.href = `/#/user/${address}`
+    }}>
+  </div>
   <div class="flex-container">
     <div class="chart">
       <Scatter data={positionsData} />
@@ -51,5 +57,29 @@
     width: 100vh;
     margin: auto;
     margin-top: 20px;
+  }
+  .search-input-container {
+    display: flex;
+    justify-content: center;
+    margin: 2rem;
+  }
+  .search-input-container input {
+    background-color: var(--layer100);
+    outline: none;
+    border: none;
+    color: var(--text100);
+    width: 85%;
+    padding: 1rem;
+  }
+  @media (max-width: 780px) {
+    .search-input-container input {
+      width: 100%;
+      padding: 0.5rem
+    }
+  }
+  @media (max-width: 500px) {
+    .search-input-container {
+      margin: 1rem;
+    }
   }
 </style>

@@ -2,7 +2,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang='ts'>
   import { onMount } from "svelte";
-  import { getUserHistory, getUserOpenOrders, getUserPositions } from '../scripts/web3';
+  import { getUserHistory, getUserOpenOrders, getUserPositions, resolveEns } from '../scripts/web3';
   import { ARBISCAN_ICON, DE_BANK_ICON, SPINNER_ICON } from "../scripts/icons";
   import DataComp from "./components/DataComp.svelte";
   import { prices } from "../scripts/stores";
@@ -23,6 +23,12 @@
   onMount(async () => {
     let url = window.location.href.split('/')
     user = url[url.length - 1]
+    if (user.endsWith('.eth')) {
+      const add = await resolveEns(user)
+      if (typeof add == 'string') {
+        user = add;
+      }
+    }
     if (!(user.startsWith('0x') && user.length == 42)) {
       error = 'The Address is invalid';
       loading = false

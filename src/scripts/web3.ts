@@ -4,6 +4,7 @@ import Web3 from 'web3'
 import { getPriceDenominator } from './utils.js';
 import { ETH } from './constants.js';
 
+const web3Mainnet = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${PUBLIC_INFURA_KEY}`));
 const web3 = new Web3(new Web3.providers.HttpProvider(`https://arbitrum-mainnet.infura.io/v3/${PUBLIC_INFURA_KEY}`));
 
 const PositionStoreContractAdd = '0x29087096c889Fd7158CB6cBA675ED561d36DBFa7';
@@ -102,4 +103,8 @@ export const getUserHistory = async (address: string) => {
   }
   await call(skipped)
   return orders;  
+}
+
+export const resolveEns = async (ensName: string) => {
+  return web3Mainnet.eth.ens.getAddress(ensName)
 }
