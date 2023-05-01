@@ -256,12 +256,6 @@
     font-size: 12px;
     fill: #999;
   }
-  .eth {
-    color: #ff003f;
-  }
-  .usdc {
-    color: yellow;
-  }
   .x-axis text {
     text-anchor: middle;
   }

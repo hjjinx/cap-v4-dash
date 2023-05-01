@@ -25,14 +25,13 @@
     } else {
       sortBy = _sortBy;
       sortOrder = 'desc';
-      if (_sortBy == 'market') {
+      if (_sortBy == 'market' || _sortBy == 'type') {
         data = data.sort((a, b) => b[_sortBy].localeCompare(a[_sortBy]));
       } else {
         data = data.sort((a, b) => b[_sortBy] - a[_sortBy]);
       }
     }
   };
-
 </script>
 
 <div class="history">

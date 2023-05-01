@@ -129,4 +129,14 @@
     width: 0px;
     background: transparent;
   }
+
+  :global(.eth) {
+    color: #ff003f;
+  }
+  :global(.usdc) {
+    color: yellow;
+  }
+  :global(.white) {
+    color: white
+  }
 </style>

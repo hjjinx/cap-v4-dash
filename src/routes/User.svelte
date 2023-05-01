@@ -6,7 +6,8 @@
   import { ARBISCAN_ICON, DE_BANK_ICON, SPINNER_ICON } from "../scripts/icons";
   import DataComp from "./components/DataComp.svelte";
   import { prices } from "../scripts/stores";
-  import { addDollarInfoToData, calculateUPLs } from "../scripts/utils";
+  import { addDollarInfoToData, calculateUPLs, getPriceDenominator, numberWithCommas } from "../scripts/utils";
+  import { ETH, USDC } from "../scripts/constants";
 
   let loading = true;
   let user: string;
@@ -15,6 +16,10 @@
   let positions: any[] = []
   let orders: any[] = []
   let history: any[] = []
+  let totalFeeETH = 0;
+  let totalFeeUSD = 0;
+  let firstTradeDate = ''
+  let totalUPL = 0;
   onMount(async () => {
     let url = window.location.href.split('/')
     user = url[url.length - 1]
@@ -31,6 +36,19 @@
     calculateUPLs(positions, $prices)
     orders = addDollarInfoToData(orders, $prices)
     history = addDollarInfoToData(history, $prices)
+    let fee = history.reduce((acc: number[], curr: any) => {
+      if (curr.asset == ETH) {
+        return [acc[0] + (Number(curr.fee) / getPriceDenominator(ETH)), acc[1]]
+      } else {
+        return [acc[0], acc[1] + (Number(curr.fee) / getPriceDenominator(USDC))]
+      }
+    }, [0, 0])
+    totalFeeETH = fee[0];
+    totalFeeUSD = fee[1];
+    const _date = new Date(history.reduce((first, curr) => first = first > curr.blockTimestamp ? curr.blockTimestamp : first, new Date()) * 1000)
+    firstTradeDate = _date.toDateString().slice(3) + ' ' + _date.toLocaleTimeString()
+
+    totalUPL = positions.reduce((acc: number,curr: any) => acc + curr.uplInDollars, 0)
     loading = false
   })
 
@@ -76,6 +94,21 @@
               {@html ARBISCAN_ICON}
             </a>
           </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div>
+          - Has paid 
+          <span class={"eth"}>Ξ{totalFeeETH.toFixed(3)}</span>
+          and 
+          <span class={"usdc"}>${numberWithCommas(Number(totalFeeUSD.toFixed(2)))}</span> 
+          in fees to the CAP protocol
+        </div>
+        <div>
+          - Started trading on CAP protocol on <span class="white">{firstTradeDate}</span>
+        </div>
+        <div>
+          - Current total UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(Number(totalUPL.toFixed(2)))}</span>
         </div>
       </div>
       <div class=history-container>
@@ -128,6 +161,10 @@
     margin-left: 5px;
     overflow: hidden;
   }
+  .user-page-container .stats {
+    padding: 1.5rem 2rem 0;
+    color: var(--text200);
+  }
   .avatar {
     width: 50px;
     height: 50px;
@@ -171,6 +208,9 @@
   @media (max-width: 780px) {
     .user-page-container .header {
       padding: 0 0.5rem;
+    }
+    .user-page-container .stats {
+      padding: 1.5rem 0.5rem 0;
     }
     .rows-container {
       max-width: 100%;
