@@ -38,6 +38,7 @@
     <input bind:value={address} placeholder="Search for any Address / ENS" on:keypress={(e) => {
       if (e.code == 'Enter') window.location.href = `/#/user/${address}`
     }}>
+    <button on:click={() => address.length ? window.location.href = `/#/user/${address}` : null}>Submit</button>
   </div>
   <div class="flex-container">
     <div class="chart">
@@ -72,6 +73,16 @@
     padding: 1rem;
     border-radius: 5px;
   }
+  .search-input-container button {
+    color: var(--text100);
+    background-color: var(--layer0);
+    border: none;
+    margin-left: 5px;
+    outline: none;
+    border-radius: 5px;
+    min-width: 100px;
+    cursor: pointer;
+  }
   @media (max-width: 780px) {
     .search-input-container input {
       width: 100%;
@@ -81,6 +92,9 @@
   @media (max-width: 500px) {
     .search-input-container {
       margin: 1rem;
+    }
+    .search-input-container button {
+      min-width: unset;
     }
   }
 </style>

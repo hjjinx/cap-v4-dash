@@ -55,9 +55,11 @@
     history = addDollarInfoToData(history, $prices)
     console.log(userStats)
 
-    feesEth = Number((userStats.feesEth / getPriceDenominator(ETH)).toFixed(3))
-    feesUsdc = Number((userStats.feesUsdc / getPriceDenominator(USDC)).toFixed(1))
-    totalFees = Number(((userStats.feesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.feesUsdc / getPriceDenominator(USDC))).toFixed(1))
+    if (userStats) {
+      feesEth = Number((userStats.feesEth / getPriceDenominator(ETH)).toFixed(3))
+      feesUsdc = Number((userStats.feesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      totalFees = Number(((userStats.feesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.feesUsdc / getPriceDenominator(USDC))).toFixed(1))
+    }
 
     const _date = new Date(history.reduce((first, curr) => first = first > curr.blockTimestamp ? curr.blockTimestamp : first, new Date().getTime() * 1000) * 1000)
     if (String(_date) == 'Invalid Date') firstTradeDate = null
@@ -133,31 +135,31 @@
         <div class="stats">
           <div class={"eth head"}>ETH</div>
           <div>
-            - Fee:  
+            Fee:  
             <span class:pos={feesEth > 0} class:neg={feesEth < 0}>Ξ{numberWithCommas(feesEth)}</span>
           </div>
           <div>
-            - UPL: <span class:pos={uplEth > 0} class:neg={uplEth < 0}>${numberWithCommas(uplEth)}</span>
+            UPL: <span class:pos={uplEth > 0} class:neg={uplEth < 0}>${numberWithCommas(uplEth)}</span>
           </div>
         </div>
         <div class="stats">
           <div class={"usdc head"}>USDC</div>
           <div>
-            - Fee:
+            Fee:
             <span class:pos={feesUsdc > 0} class:neg={feesUsdc < 0}>${numberWithCommas(feesUsdc)}</span>
           </div>
           <div>
-            - UPL: <span class:pos={uplUsdc > 0} class:neg={uplUsdc < 0}>${numberWithCommas(uplUsdc)}</span>
+            UPL: <span class:pos={uplUsdc > 0} class:neg={uplUsdc < 0}>${numberWithCommas(uplUsdc)}</span>
           </div>
         </div>
         <div class="stats">
           <div class={"white head"}>Overall</div>
           <div>
-            - Fee: 
+            Fee: 
             <span class:pos={totalFees > 0} class:neg={totalFees < 0}>${numberWithCommas(totalFees)}</span>
           </div>
           <div>
-            - UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
+            UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
           </div>
         </div>
       </div>
