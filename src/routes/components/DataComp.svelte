@@ -8,9 +8,6 @@
 
   let sortBy: string;
   let sortOrder = 'desc';
-  /**
-   * @type {any[]}
-   */
   export let data: any[];
   export let dataType: string = 'positions';
   onMount(async () => {

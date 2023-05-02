@@ -141,6 +141,52 @@ export const getUserStats = async (address: string) => {
   }
 }
 
+export const getUsers = async () => {
+  let users: any[] = []
+  let skipped = 0
+  const call = async (skip: number) => {
+    let _users = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.7', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+              users(
+              skip: ${skip}
+              first: 1000
+              orderBy: id
+              orderDirection: asc
+              subgraphError: deny
+            ) {
+              id
+              numOrdersEth
+              volumeEth
+              numLiquidationsEth
+              liquidationVolumeEth
+              feesEth
+              numOrdersUsdc
+              volumeUsdc
+              numLiquidationsUsdc
+              liquidationVolumeUsdc
+              feesUsdc
+              pnl
+            }
+          }
+          `,
+      }),
+    }).then(res => res.json())
+    users.push(..._users?.data?.users)
+    if (_users?.data?.users?.length == 1000) {
+      skipped += 1000
+      await call(skipped)
+    }
+  }
+  await call(skipped)
+  return users;  
+}
+
 export const resolveEns = async (ensName: string) => {
   return web3Mainnet.eth.ens.getAddress(ensName)
 }
