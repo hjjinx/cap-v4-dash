@@ -163,6 +163,8 @@ export const getOrderType = (orderType: number) => {
       return 'Limit'
     case 2:
       return 'Stop'
+    case 3:
+      return 'Liquidation'
     default:
      return 'Market'
   }

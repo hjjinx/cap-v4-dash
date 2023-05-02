@@ -55,7 +55,7 @@ export const getUserHistory = async (address: string) => {
   let orders: any[] = []
   let skipped = 0
   const call = async (skip: number) => {
-    let _orders = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.2', {
+    let _orders = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.7', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export const getUserHistory = async (address: string) => {
       body: JSON.stringify({
         query: `
             query {
-              orderCreateds(
+              orders(
                 skip: ${skip},
                 first: 1000,
                 orderBy: blockTimestamp,
@@ -90,13 +90,14 @@ export const getUserHistory = async (address: string) => {
                 blockNumber
                 blockTimestamp
                 transactionHash
+                wasCancelled
               }
             }
           `,
       }),
     }).then(res => res.json())
-    orders.push(..._orders?.data?.orderCreateds)
-    if (_orders?.data?.orderCreateds?.length == 1000) {
+    orders.push(..._orders?.data?.orders)
+    if (_orders?.data?.orders?.length == 1000) {
       skipped += 1000
       await call(skipped)
     }
