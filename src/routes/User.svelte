@@ -2,7 +2,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang='ts'>
   import { onMount } from "svelte";
-  import { getUserHistory, getUserOpenOrders, getUserPositions, resolveEns } from '../scripts/web3';
+  import { getUserHistory, getUserOpenOrders, getUserPositions, getUserStats, resolveEns } from '../scripts/web3';
   import { ARBISCAN_ICON, DE_BANK_ICON, SPINNER_ICON } from "../scripts/icons";
   import DataComp from "./components/DataComp.svelte";
   import { prices } from "../scripts/stores";
@@ -16,10 +16,14 @@
   let positions: any[] = []
   let orders: any[] = []
   let history: any[] = []
-  let totalFeeETH = 0;
-  let totalFeeUSD = 0;
-  let firstTradeDate: string | null = ''
+  let userStats: any;
+  let feesEth = 0;
+  let feesUsdc = 0;
+  let totalFees = 0;
+  let uplEth = 0;
+  let uplUsdc = 0;
   let totalUPL = 0;
+  let firstTradeDate: string | null = ''
   onMount(async () => {
     let url = window.location.href.split('/')
     user = url[url.length - 1]
@@ -39,28 +43,38 @@
       loading = false
       return;
     }
-    [positions, orders, history] = await Promise.all([
+    user = user.toLocaleLowerCase();
+    [positions, orders, history, userStats] = await Promise.all([
       await getUserPositions(user),
       await getUserOpenOrders(user),
-      await getUserHistory(user)
+      await getUserHistory(user),
+      await getUserStats(user),
     ])
     calculateUPLs(positions, $prices)
     orders = addDollarInfoToData(orders, $prices)
     history = addDollarInfoToData(history, $prices)
-    let fee = history.reduce((acc: number[], curr: any) => {
-      if (curr.asset == ETH) {
-        return [acc[0] + (Number(curr.fee) / getPriceDenominator(ETH)), acc[1]]
-      } else {
-        return [acc[0], acc[1] + (Number(curr.fee) / getPriceDenominator(USDC))]
-      }
-    }, [0, 0])
-    totalFeeETH = fee[0];
-    totalFeeUSD = fee[1];
+    console.log(userStats)
+
+    feesEth = Number((userStats.feesEth / getPriceDenominator(ETH)).toFixed(3))
+    feesUsdc = Number((userStats.feesUsdc / getPriceDenominator(USDC)).toFixed(1))
+    totalFees = Number(((userStats.feesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.feesUsdc / getPriceDenominator(USDC))).toFixed(1))
+
     const _date = new Date(history.reduce((first, curr) => first = first > curr.blockTimestamp ? curr.blockTimestamp : first, new Date().getTime() * 1000) * 1000)
     if (String(_date) == 'Invalid Date') firstTradeDate = null
     else firstTradeDate = _date.toDateString().slice(3) + ' ' + _date.toLocaleTimeString()
 
-    totalUPL = positions.reduce((acc: number,curr: any) => acc + curr.uplInDollars, 0)
+    for (let position of positions) {
+      if (position.asset == ETH) {
+        uplEth += position.upl
+        totalUPL += position.uplInDollars
+      } else {
+        uplUsdc += position.upl
+        totalUPL += position.upl
+      }
+    }
+    uplEth = Number(uplEth.toFixed(3))
+    uplUsdc = Number(uplUsdc.toFixed(1))
+    totalUPL = Number(totalUPL.toFixed(1))
     loading = false
   })
 
@@ -108,23 +122,43 @@
           </div>
         </div>
       </div>
-      <div class="stats">
-        <div>
-          - Has paid 
-          <span class={"eth"}>Ξ{totalFeeETH.toFixed(3)}</span>
-          and 
-          <span class={"usdc"}>${numberWithCommas(Number(totalFeeUSD.toFixed(2)))}</span> 
-          in fees to the CAP protocol
+      <div class='first-trade-info'>
+        {#if firstTradeDate == null}
+          Has never traded on CAP
+        {:else}
+          Started trading on CAP on <span class="white">{firstTradeDate}</span>
+        {/if}
+      </div>
+      <div class='stats-container'>
+        <div class="stats">
+          <div class={"eth head"}>ETH</div>
+          <div>
+            - Fee:  
+            <span class:pos={feesEth > 0} class:neg={feesEth < 0}>Ξ{numberWithCommas(feesEth)}</span>
+          </div>
+          <div>
+            - UPL: <span class:pos={uplEth > 0} class:neg={uplEth < 0}>${numberWithCommas(uplEth)}</span>
+          </div>
         </div>
-        <div>
-          {#if firstTradeDate == null}
-            - Has never traded on CAP
-          {:else}
-            - Started trading on CAP protocol on <span class="white">{firstTradeDate}</span>
-          {/if}
+        <div class="stats">
+          <div class={"usdc head"}>USDC</div>
+          <div>
+            - Fee:
+            <span class:pos={feesUsdc > 0} class:neg={feesUsdc < 0}>${numberWithCommas(feesUsdc)}</span>
+          </div>
+          <div>
+            - UPL: <span class:pos={uplUsdc > 0} class:neg={uplUsdc < 0}>${numberWithCommas(uplUsdc)}</span>
+          </div>
         </div>
-        <div>
-          - Current total UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(Number(totalUPL.toFixed(2)))}</span>
+        <div class="stats">
+          <div class={"white head"}>Overall</div>
+          <div>
+            - Fee: 
+            <span class:pos={totalFees > 0} class:neg={totalFees < 0}>${numberWithCommas(totalFees)}</span>
+          </div>
+          <div>
+            - UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
+          </div>
         </div>
       </div>
       <div class=history-container>
@@ -177,9 +211,31 @@
     margin-left: 5px;
     overflow: hidden;
   }
-  .user-page-container .stats {
-    padding: 1.5rem 2rem 0;
+  .first-trade-info {
+    margin: 1rem;
+    padding: 0.0 1rem;
     color: var(--text200);
+  }
+  .user-page-container .stats-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  .user-page-container .stats-container .stats {
+    padding: 0.75rem 1rem;
+    color: var(--text200);
+    background: var(--layer25);
+    margin: 1rem 0.5rem;
+    flex: 1;
+    height: 100px;
+    max-width: 200px;
+  }
+  .head {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 22px;
   }
   .avatar {
     width: 50px;

@@ -106,6 +106,41 @@ export const getUserHistory = async (address: string) => {
   return orders;  
 }
 
+export const getUserStats = async (address: string) => {
+  try {
+    let data = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.7', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+            query {
+              user(id: "${address}", subgraphError: deny) {
+                id
+                numOrdersEth
+                volumeEth
+                numLiquidationsEth
+                liquidationVolumeEth
+                feesEth
+                numOrdersUsdc
+                volumeUsdc
+                numLiquidationsUsdc
+                liquidationVolumeUsdc
+                feesUsdc
+                pnl
+              }
+            }
+          `,
+      }),
+    }).then(res => res.json())
+    return data?.data?.user
+  } catch (err) {
+    console.log(err)
+    return null
+  }
+}
+
 export const resolveEns = async (ensName: string) => {
   return web3Mainnet.eth.ens.getAddress(ensName)
 }
