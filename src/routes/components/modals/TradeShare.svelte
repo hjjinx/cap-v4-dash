@@ -16,7 +16,7 @@
         imageData = dataUrl;
         var img = new Image();
         img.src = dataUrl;
-        img.style.height = "85vh";
+        img.id = 'final-banner'
         document.getElementById("canvas").appendChild(img);
         document.getElementById("canvas-content").remove();
         document.getElementById("trade-loader-container").remove();
@@ -116,7 +116,7 @@
     width: 948px; 
     height: 1422px;
   }
-.container {
+  .container {
     width: 948px;
     height: 1422px;
     padding: 60px 50px;
@@ -229,5 +229,16 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+  }
+  :global(#final-banner) {
+    height: 85vh;
+  }
+  @media (max-width: 768px) {
+    :global(#final-banner) {
+      height: 66vh;
+    }
+    :global(.modal) {
+      --modal-width: 350px!important;
+    }
   }
 </style>

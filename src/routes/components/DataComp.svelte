@@ -67,7 +67,7 @@
       <div
         class="column column-price"
       >
-        Liq. Price (Estimated)
+        Est. Liq. Price
       </div>
       <div class='column column-liqprice'>
         Share
