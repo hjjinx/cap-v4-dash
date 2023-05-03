@@ -5,11 +5,10 @@
   import { SPINNER_ICON, DOWNLOAD_ICON, CAP_LOGO } from "../../../scripts/icons";
   import { getUPL, formatPnl, numberWithCommas, priceFormatter, getPriceDenominator } from "../../../scripts/utils";
   import { prices } from "../../../scripts/stores";
-  import bg from '../../../images/banner-background.jpg';
+  import milady from '../../../images/milady_1.jpg';
 
   export let data: any;
   let imageData: any;
-  console.log($prices[data.market])
   onMount(async () => {
     domtoimage
       .toPng(document.getElementById("canvas-content"))
@@ -44,7 +43,7 @@
     <div id="canvas">
       <div class="container" id="canvas-content">
         <div class='bg-container'>
-          <img src={bg} class='bg' alt=''/>
+          <img src={milady} class='bg' alt=''/>
         </div>
         <div class="cap-logo">
           {@html CAP_LOGO}
@@ -103,7 +102,7 @@
     /* background-image: url("a.jpg"); */
     background-repeat: no-repeat;
     display: flex;
-    z-index: -1;
+    z-index: 0;
     justify-content: center;
   }
   .bg-container {

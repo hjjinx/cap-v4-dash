@@ -26,7 +26,6 @@
       user.totalOrders = +user.numOrdersEth + +user.numOrdersUsdc;
       user.totalLiquidations = +user.numLiquidationsEth + +user.numLiquidationsUsdc;
     }
-    console.log(data)
   });
 
   $: changeSort = (_sortBy: string) => {
