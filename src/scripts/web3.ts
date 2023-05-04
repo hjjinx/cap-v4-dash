@@ -145,7 +145,7 @@ export const getUsers = async () => {
   let users: any[] = []
   let skipped = 0
   const call = async (skip: number) => {
-    let _users = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.7', {
+    let _users = await fetch('https://api.studio.thegraph.com/query/43986/cap/0.0.8', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -164,14 +164,25 @@ export const getUsers = async () => {
               numOrdersEth
               volumeEth
               numLiquidationsEth
+              liquidationMarginEth
               liquidationVolumeEth
-              feesEth
+              pnlEth
+              totalFeesEth
+              poolFeesEth
+              stakingFeesEth
+              treasuryFeesEth
+              keeperFeesEth
               numOrdersUsdc
               volumeUsdc
               numLiquidationsUsdc
+              liquidationMarginUsdc
               liquidationVolumeUsdc
-              feesUsdc
-              pnl
+              pnlUsdc
+              totalFeesUsdc
+              poolFeesUsdc
+              stakingFeesUsdc
+              treasuryFeesUsdc
+              keeperFeesUsdc
             }
           }
           `,

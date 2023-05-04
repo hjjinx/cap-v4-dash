@@ -6,7 +6,7 @@
     <div class="left">
       <a class="logo" href="/#"> <h1>🧢</h1> </a>
       <a class={"link"} href="#/positions">Positions</a>
-      <a class={"link"} href="#/users">Users</a>
+      <a class={"link"} href="#/leaderboard">Leaderboard</a>
     </div>
   </div>
 </header>

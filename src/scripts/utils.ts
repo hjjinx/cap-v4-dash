@@ -8,7 +8,7 @@ import { component, prices, showPositionInfoModal, sharePositionModal } from "./
 import Home from '../routes/Home.svelte';
 import Positions from '../routes/Positions.svelte';
 import User from '../routes/User.svelte';
-import Users from '../routes/Users.svelte';
+import Leaderboard from '../routes/Leaderboard.svelte';
 
 export function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -151,8 +151,8 @@ export function loadRoute(path: string) {
     component.set(Home);
   } else if (path.includes("/positions")) {
     component.set(Positions);
-  } else if (path.includes("/users")) {
-    component.set(Users);
+  } else if (path.includes("/leaderboard")) {
+    component.set(Leaderboard);
   } else if (path.includes("/user")) {
     component.set(User);
   }

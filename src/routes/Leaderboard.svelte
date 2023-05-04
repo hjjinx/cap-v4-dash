@@ -14,14 +14,21 @@
   onMount(async () => {
     data = await getUsers()
     for (const user of data) {
-      user.feesUsdc = Number((+user.feesUsdc / getPriceDenominator(USDC)).toFixed(2))
-      user.feesEth = Number((+user.feesEth / getPriceDenominator(ETH)).toFixed(3))
+      user.feesUsdc = Number((+user.totalFeesUsdc / getPriceDenominator(USDC)).toFixed(2))
+      user.feesEth = Number((+user.totalFeesEth / getPriceDenominator(ETH)).toFixed(3))
+      user.liquidationMarginUsdc = Number((+user.liquidationMarginUsdc / getPriceDenominator(USDC)).toFixed(2))
+      user.liquidationMarginEth = Number((+user.liquidationMarginEth / getPriceDenominator(ETH)).toFixed(3))
       user.liquidationVolumeUsdc = Number((+user.liquidationVolumeUsdc / getPriceDenominator(USDC)).toFixed(2))
       user.liquidationVolumeEth = Number((+user.liquidationVolumeEth / getPriceDenominator(ETH)).toFixed(3))
+      user.pnlUsdc = Number((+user.pnlUsdc / getPriceDenominator(USDC)).toFixed(2))
+      user.pnlEth = Number((+user.pnlEth / getPriceDenominator(ETH)).toFixed(3))
       user.volumeUsdc = Number((+user.volumeUsdc / getPriceDenominator(USDC)).toFixed(2))
       user.volumeEth = Number((+user.volumeEth / getPriceDenominator(ETH)).toFixed(3))
-      user.totalFees = Number((+user.feesUsdc + +user.feesEth * $prices['ETH-USD'][0]).toFixed(2));
+      user.totalFees = Number((+user.feesUsdc + (+user.feesEth) * $prices['ETH-USD'][0]).toFixed(2));
       user.totalLiquidationVolume = Number((+user.liquidationVolumeEth * $prices['ETH-USD'][0] + user.liquidationVolumeUsdc).toFixed(2));
+      user.totalLiquidationMargin = Number(((+user.liquidationMarginEth) * $prices['ETH-USD'][0] + +user.liquidationMarginUsdc).toFixed(2));
+      user.grossPnl = Number(((+user.pnlEth) * $prices['ETH-USD'][0] + +user.pnlUsdc).toFixed(2));
+      user.netPnl = Number((user.grossPnl - user.totalFees).toFixed(2));
       user.totalVolume = Number((+user.volumeEth * $prices['ETH-USD'][0] + +user.volumeUsdc).toFixed(2));
       user.totalOrders = +user.numOrdersEth + +user.numOrdersUsdc;
       user.totalLiquidations = +user.numLiquidationsEth + +user.numLiquidationsUsdc;
@@ -75,14 +82,14 @@
           >{sortBy == 'totalLiquidations' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
-        <div class="column column-volume" on:click={() => changeSort('totalLiquidationVolume')} title='Volume liquidated'>
-          Liq Volume <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
-          >{sortBy == 'totalLiquidationVolume' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
+        <div class="column column-volume" on:click={() => changeSort('totalLiquidationMargin')} title='Margin liquidated'>
+          Liq Margin <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
+          >{sortBy == 'totalLiquidationMargin' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
-        <div class="column column-volume" on:click={() => changeSort('pnl')} title='PnL before fees'>
+        <div class="column column-volume" on:click={() => changeSort('grossPnl')} title='PnL before fees'>
           Gross PnL <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
-          >{sortBy == 'pnl' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
+          >{sortBy == 'grossPnl' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
         <div class="column column-margin" on:click={() => changeSort('totalFees')} title='Total fees paid'>
@@ -90,9 +97,9 @@
           >{sortBy == 'totalFees' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
-        <div class="column column-volume" on:click={() => changeSort('pnl')} title='PnL after fees'>
+        <div class="column column-volume" on:click={() => changeSort('netPnl')} title='PnL after fees'>
           Net PnL <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
-          >{sortBy == 'pnl' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
+          >{sortBy == 'netPnl' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
         <div class="column column-close" />
@@ -121,17 +128,17 @@
             <div class="column column-orders" title={`ETH: ${numberWithCommas(user.numLiquidationsEth)} + USDC: ${numberWithCommas(user.numLiquidationsUsdc)}`}>
               {numberWithCommas(user.totalLiquidations)}
             </div>
-            <div class="column column-volume" class:neg={user.totalLiquidations != 0} title={`Ξ${numberWithCommas(user.liquidationVolumeEth)} + $${numberWithCommas(user.liquidationVolumeUsdc)}`}>
-              ${numberWithCommas(user.totalLiquidationVolume)}
+            <div class="column column-volume" class:neg={user.totalLiquidations != 0} title={`Ξ${numberWithCommas(user.liquidationMarginEth)} + $${numberWithCommas(user.liquidationMarginUsdc)}`}>
+              ${numberWithCommas(user.totalLiquidationMargin)}
             </div>
-            <div class="column column-volume">
-              -
+            <div class="column column-volume pos" class:neg={user.grossPnl < 0}>
+              ${numberWithCommas(user.grossPnl)}
             </div>
             <div class="column column-margin usdc" title={`Ξ${numberWithCommas(user.feesEth)} + $${numberWithCommas(user.feesUsdc)}`}>
               ${numberWithCommas(user.totalFees)}
             </div>
-            <div class="column column-volume">
-              -
+            <div class="column column-volume pos" class:neg={user.netPnl < 0}>
+              ${numberWithCommas(user.netPnl)}
             </div>
           </div>
         {/each}
