@@ -240,13 +240,13 @@
             <div class="label">
               Gross PnL
             </div>
-            <span class:pos={grossPnlUsdc > 0} class:neg={grossPnlUsdc < 0}>Ξ{numberWithCommas(grossPnlUsdc)}</span>
+            <span class:pos={grossPnlUsdc > 0} class:neg={grossPnlUsdc < 0}>${numberWithCommas(grossPnlUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Net PnL
             </div>
-            <span class:pos={netPnlUsdc > 0} class:neg={netPnlUsdc < 0}>Ξ{numberWithCommas(netPnlUsdc)}</span>
+            <span class:pos={netPnlUsdc > 0} class:neg={netPnlUsdc < 0}>${numberWithCommas(netPnlUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
@@ -291,13 +291,13 @@
             <div class="label">
               Gross PnL
             </div>
-            <span class:pos={grossPnlTotal > 0} class:neg={grossPnlTotal < 0}>Ξ{numberWithCommas(grossPnlTotal)}</span>
+            <span class:pos={grossPnlTotal > 0} class:neg={grossPnlTotal < 0}>${numberWithCommas(grossPnlTotal)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Net PnL
             </div>
-            <span class:pos={netPnlTotal > 0} class:neg={netPnlTotal < 0}>Ξ{numberWithCommas(netPnlTotal)}</span>
+            <span class:pos={netPnlTotal > 0} class:neg={netPnlTotal < 0}>${numberWithCommas(netPnlTotal)}</span>
           </div>
           <div class="data-row">
             <div class="label">
