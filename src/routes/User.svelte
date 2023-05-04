@@ -78,11 +78,11 @@
 
     if (userStats) {
       grossPnlEth = Number((userStats.pnlEth / getPriceDenominator(ETH)).toFixed(3));
-      grossPnlUsdc = Number((userStats.pnlUsdc / getPriceDenominator(USDC)).toFixed(3));
-      grossPnlTotal = Number(((userStats.pnlEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + userStats.pnlUsdc / getPriceDenominator(USDC)).toFixed(3));
+      grossPnlUsdc = Number((userStats.pnlUsdc / getPriceDenominator(USDC)).toFixed(1));
+      grossPnlTotal = Number(((userStats.pnlEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + userStats.pnlUsdc / getPriceDenominator(USDC)).toFixed(1));
       netPnlEth = Number(((userStats.pnlEth - userStats.totalFeesEth) / getPriceDenominator(ETH)).toFixed(3));
-      netPnlUsdc = Number(((userStats.pnlUsdc - userStats.totalFeesUsdc) / getPriceDenominator(USDC)).toFixed(3));
-      netPnlTotal = Number((((userStats.pnlEth - userStats.totalFeesEth) * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + ((userStats.pnlUsdc - userStats.totalFeesUsdc) / getPriceDenominator(USDC))).toFixed(3));
+      netPnlUsdc = Number(((userStats.pnlUsdc - userStats.totalFeesUsdc) / getPriceDenominator(USDC)).toFixed(1));
+      netPnlTotal = Number((((userStats.pnlEth - userStats.totalFeesEth) * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + ((userStats.pnlUsdc - userStats.totalFeesUsdc) / getPriceDenominator(USDC))).toFixed(1));
       
       totalFeesEth = Number((userStats.totalFeesEth / getPriceDenominator(ETH)).toFixed(3))
       totalFeesUsdc = Number((userStats.totalFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
