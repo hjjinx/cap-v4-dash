@@ -13,6 +13,8 @@ const PositionStoreContract = new web3.eth.Contract(PositionStoreABI, PositionSt
 const OrderStoreContractAdd = '0xF75eFA4CB21529489877566ffE68229ffF89f456';
 const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContractAdd);
 
+const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.0.9'
+
 export const getPositions = async () => {
   let positions = await PositionStoreContract.methods.getPositions(10000, 0).call((error: any) => {
     if (error) {
@@ -108,7 +110,7 @@ export const getUserHistory = async (address: string) => {
 
 export const getUserStats = async (address: string) => {
   try {
-    let data = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.7', {
+    let data = await fetch(GRAPH, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -121,14 +123,25 @@ export const getUserStats = async (address: string) => {
                 numOrdersEth
                 volumeEth
                 numLiquidationsEth
+                liquidationMarginEth
                 liquidationVolumeEth
-                feesEth
+                pnlEth
+                totalFeesEth
+                poolFeesEth
+                stakingFeesEth
+                treasuryFeesEth
+                keeperFeesEth
                 numOrdersUsdc
                 volumeUsdc
                 numLiquidationsUsdc
+                liquidationMarginUsdc
                 liquidationVolumeUsdc
-                feesUsdc
-                pnl
+                pnlUsdc
+                totalFeesUsdc
+                poolFeesUsdc
+                stakingFeesUsdc
+                treasuryFeesUsdc
+                keeperFeesUsdc
               }
             }
           `,
@@ -145,7 +158,7 @@ export const getUsers = async () => {
   let users: any[] = []
   let skipped = 0
   const call = async (skip: number) => {
-    let _users = await fetch('https://api.studio.thegraph.com/query/43986/cap/0.0.8', {
+    let _users = await fetch(GRAPH, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

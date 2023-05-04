@@ -8,6 +8,8 @@
   import { prices } from "../scripts/stores";
   import { addDollarInfoToData, calculateUPLs, getPriceDenominator, numberWithCommas } from "../scripts/utils";
   import { ETH, USDC } from "../scripts/constants";
+  import ethSvg from '../images/eth.svg'
+  import usdcSvg from '../images/usdc.svg'
 
   let loading = true;
   let user: string;
@@ -17,13 +19,32 @@
   let orders: any[] = []
   let history: any[] = []
   let userStats: any;
-  let feesEth = 0;
-  let feesUsdc = 0;
-  let totalFees = 0;
+  let grossPnlEth = 0;
+  let grossPnlUsdc = 0;
+  let grossPnlTotal = 0;
+  let netPnlEth = 0;
+  let netPnlUsdc = 0;
+  let netPnlTotal = 0;
+  let totalFeesEth = 0;
+  let totalFeesUsdc = 0;
+  let poolFeesEth = 0;
+  let poolFeesUsdc = 0;
+  let stakingFeesEth = 0;
+  let stakingFeesUsdc = 0;
+  let treasuryFeesEth = 0;
+  let treasuryFeesUsdc = 0;
+  let keeperFeesEth = 0;
+  let keeperFeesUsdc = 0;
+  let totalTotalFees = 0;
+  let totalPoolFees = 0;
+  let totalStakingFees = 0;
+  let totalTreasuryFees = 0;
+  let totalKeeperFees = 0;
   let uplEth = 0;
   let uplUsdc = 0;
   let totalUPL = 0;
-  let firstTradeDate: string | null = ''
+  let firstTradeDate: string | null | number = new Date().getTime() * 1000
+  let lastTradeDate: string | null | number = new Date(0).getTime() * 1000
   onMount(async () => {
     let url = window.location.href.split('/')
     user = url[url.length - 1]
@@ -56,14 +77,37 @@
     console.log(userStats)
 
     if (userStats) {
-      feesEth = Number((userStats.feesEth / getPriceDenominator(ETH)).toFixed(3))
-      feesUsdc = Number((userStats.feesUsdc / getPriceDenominator(USDC)).toFixed(1))
-      totalFees = Number(((userStats.feesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.feesUsdc / getPriceDenominator(USDC))).toFixed(1))
+      grossPnlEth = Number((userStats.pnlEth / getPriceDenominator(ETH)).toFixed(3));
+      grossPnlUsdc = Number((userStats.pnlUsdc / getPriceDenominator(USDC)).toFixed(3));
+      grossPnlTotal = Number(((userStats.pnlEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + userStats.pnlUsdc / getPriceDenominator(USDC)).toFixed(3));
+      netPnlEth = Number(((userStats.pnlEth - userStats.totalFeesEth) / getPriceDenominator(ETH)).toFixed(3));
+      netPnlUsdc = Number(((userStats.pnlUsdc - userStats.totalFeesUsdc) / getPriceDenominator(USDC)).toFixed(3));
+      netPnlTotal = Number((((userStats.pnlEth - userStats.totalFeesEth) * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + ((userStats.pnlUsdc - userStats.totalFeesUsdc) / getPriceDenominator(USDC))).toFixed(3));
+      
+      totalFeesEth = Number((userStats.totalFeesEth / getPriceDenominator(ETH)).toFixed(3))
+      totalFeesUsdc = Number((userStats.totalFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      poolFeesEth = Number((userStats.poolFeesEth / getPriceDenominator(ETH)).toFixed(3))
+      poolFeesUsdc = Number((userStats.poolFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      stakingFeesEth = Number((userStats.stakingFeesEth / getPriceDenominator(ETH)).toFixed(3))
+      stakingFeesUsdc = Number((userStats.stakingFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      treasuryFeesEth = Number((userStats.treasuryFeesEth / getPriceDenominator(ETH)).toFixed(3))
+      treasuryFeesUsdc = Number((userStats.treasuryFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      keeperFeesEth = Number((userStats.keeperFeesEth / getPriceDenominator(ETH)).toFixed(3))
+      keeperFeesUsdc = Number((userStats.keeperFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      totalTotalFees = Number(((userStats.totalFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.totalFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
+      totalPoolFees = Number(((userStats.poolFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.poolFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
+      totalStakingFees = Number(((userStats.stakingFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.stakingFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
+      totalTreasuryFees = Number(((userStats.treasuryFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.treasuryFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
+      totalKeeperFees = Number(((userStats.keeperFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.keeperFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
     }
 
-    const _date = new Date(history.reduce((first, curr) => first = first > curr.blockTimestamp ? curr.blockTimestamp : first, new Date().getTime() * 1000) * 1000)
-    if (String(_date) == 'Invalid Date') firstTradeDate = null
-    else firstTradeDate = _date.toDateString().slice(3) + ' ' + _date.toLocaleTimeString()
+
+    for (let row of history) {
+      if (row.blockTimestamp > lastTradeDate!) lastTradeDate = row.blockTimestamp
+      if (row.blockTimestamp < firstTradeDate!) firstTradeDate = row.blockTimestamp
+    }
+    firstTradeDate = new Date(firstTradeDate * 1000).toDateString().slice(3) + ' ' + new Date(firstTradeDate * 1000).toLocaleTimeString()
+    lastTradeDate = new Date(lastTradeDate * 1000).toDateString().slice(3) + ' ' + new Date(lastTradeDate * 1000).toLocaleTimeString()
 
     for (let position of positions) {
       if (position.asset == ETH) {
@@ -131,35 +175,165 @@
           Started trading on CAP on <span class="white">{firstTradeDate}</span>
         {/if}
       </div>
+      <div class='last-trade-info'>
+        {#if lastTradeDate == null}
+          {''}
+        {:else}
+          Last traded on CAP on <span class="white">{lastTradeDate}</span>
+        {/if}
+      </div>
       <div class='stats-container'>
         <div class="stats">
-          <div class={"eth head"}>ETH</div>
-          <div>
-            Fee:  
-            <span class:pos={feesEth > 0} class:neg={feesEth < 0}>Ξ{numberWithCommas(feesEth)}</span>
+          <div class={"eth head"}><img src={ethSvg} class='coin-icon'/></div>
+          <div class="data-row">
+            <div class="label">
+              Gross PnL
+            </div>
+            <span class:pos={grossPnlEth > 0} class:neg={grossPnlEth < 0}>Ξ{numberWithCommas(grossPnlEth)}</span>
           </div>
-          <div>
-            UPL: <span class:pos={uplEth > 0} class:neg={uplEth < 0}>${numberWithCommas(uplEth)}</span>
+          <div class="data-row">
+            <div class="label">
+              Net PnL
+            </div>
+            <span class:pos={netPnlEth > 0} class:neg={netPnlEth < 0}>Ξ{numberWithCommas(netPnlEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Fee
+            </div>
+            <span class:pos={totalFeesEth > 0} class:neg={totalFeesEth < 0}>Ξ{numberWithCommas(totalFeesEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Pool Fee
+            </div>
+            <span class:pos={poolFeesEth > 0} class:neg={poolFeesEth < 0}>Ξ{numberWithCommas(poolFeesEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Staking Fee
+            </div>
+            <span class:pos={stakingFeesEth > 0} class:neg={stakingFeesEth < 0}>Ξ{numberWithCommas(stakingFeesEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Treasury Fee
+            </div>
+            <span class:pos={treasuryFeesEth > 0} class:neg={treasuryFeesEth < 0}>Ξ{numberWithCommas(treasuryFeesEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Keeper Fee
+            </div>
+            <span class:pos={keeperFeesEth > 0} class:neg={keeperFeesEth < 0}>Ξ{numberWithCommas(keeperFeesEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              UPL
+            </div>
+            <span class:pos={uplEth > 0} class:neg={uplEth < 0}>Ξ{numberWithCommas(uplEth)}</span>
           </div>
         </div>
         <div class="stats">
-          <div class={"usdc head"}>USDC</div>
-          <div>
-            Fee:
-            <span class:pos={feesUsdc > 0} class:neg={feesUsdc < 0}>${numberWithCommas(feesUsdc)}</span>
+          <div class={"eth head"}><img src={usdcSvg} class='coin-icon'/></div>
+          <div class="data-row">
+            <div class="label">
+              Gross PnL
+            </div>
+            <span class:pos={grossPnlUsdc > 0} class:neg={grossPnlUsdc < 0}>Ξ{numberWithCommas(grossPnlUsdc)}</span>
           </div>
-          <div>
-            UPL: <span class:pos={uplUsdc > 0} class:neg={uplUsdc < 0}>${numberWithCommas(uplUsdc)}</span>
+          <div class="data-row">
+            <div class="label">
+              Net PnL
+            </div>
+            <span class:pos={netPnlUsdc > 0} class:neg={netPnlUsdc < 0}>Ξ{numberWithCommas(netPnlUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Fee
+            </div>
+            <span class:pos={totalFeesUsdc > 0} class:neg={totalFeesUsdc < 0}>${numberWithCommas(totalFeesUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Pool Fee 
+            </div>
+            <span class:pos={poolFeesUsdc > 0} class:neg={poolFeesUsdc < 0}>${numberWithCommas(poolFeesUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Staking Fee
+            </div>
+            <span class:pos={stakingFeesUsdc > 0} class:neg={stakingFeesUsdc < 0}>${numberWithCommas(stakingFeesUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Treasury Fee 
+            </div>
+            <span class:pos={treasuryFeesUsdc > 0} class:neg={treasuryFeesUsdc < 0}>${numberWithCommas(treasuryFeesUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Keeper Fee
+            </div>
+            <span class:pos={keeperFeesUsdc > 0} class:neg={keeperFeesUsdc < 0}>${numberWithCommas(keeperFeesUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              UPL 
+            </div>
+            <span class:pos={uplUsdc > 0} class:neg={uplUsdc < 0}>${numberWithCommas(uplUsdc)}</span>
           </div>
         </div>
         <div class="stats">
-          <div class={"white head"}>Overall</div>
-          <div>
-            Fee: 
-            <span class:pos={totalFees > 0} class:neg={totalFees < 0}>${numberWithCommas(totalFees)}</span>
+          <div class={"white head"}><img src={ethSvg} class='coin-icon'/> + <img src={usdcSvg} class='coin-icon'/></div>
+          <div class="data-row">
+            <div class="label">
+              Gross PnL
+            </div>
+            <span class:pos={grossPnlTotal > 0} class:neg={grossPnlTotal < 0}>Ξ{numberWithCommas(grossPnlTotal)}</span>
           </div>
-          <div>
-            UPL: <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
+          <div class="data-row">
+            <div class="label">
+              Net PnL
+            </div>
+            <span class:pos={netPnlTotal > 0} class:neg={netPnlTotal < 0}>Ξ{numberWithCommas(netPnlTotal)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Fee 
+            </div>
+            <span class:pos={totalTotalFees > 0} class:neg={totalTotalFees < 0}>${numberWithCommas(totalTotalFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Pool Fee 
+            </div>
+            <span class:pos={poolFeesUsdc > 0} class:neg={poolFeesUsdc < 0}>${numberWithCommas(totalPoolFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Staking Fee
+            </div>
+            <span class:pos={stakingFeesUsdc > 0} class:neg={stakingFeesUsdc < 0}>${numberWithCommas(totalStakingFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Treasury Fee 
+            </div>
+            <span class:pos={treasuryFeesUsdc > 0} class:neg={treasuryFeesUsdc < 0}>${numberWithCommas(totalTreasuryFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Keeper Fee
+            </div>
+            <span class:pos={keeperFeesUsdc > 0} class:neg={keeperFeesUsdc < 0}>${numberWithCommas(totalKeeperFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              UPL
+            </div> 
+            <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
           </div>
         </div>
       </div>
@@ -180,6 +354,16 @@
 </div>
 
 <style>
+  .coin-icon {
+    height: 40px;
+  }
+  .data-row {
+    display: flex;
+    flex-direction: row;
+  }
+  .data-row .label {
+    flex: 1;
+  }
   .user-page-container {
     margin-top: 25px;
     padding: 10px;
@@ -218,6 +402,11 @@
     padding: 0.0 1rem;
     color: var(--text200);
   }
+  .last-trade-info {
+    margin: -0.5rem 1rem 1rem;
+    padding: 0.0 1rem;
+    color: var(--text200);
+  }
   .user-page-container .stats-container {
     display: flex;
     flex-direction: row;
@@ -231,13 +420,17 @@
     background: var(--layer25);
     margin: 1rem 0.5rem;
     flex: 1;
-    height: 100px;
-    max-width: 200px;
+    max-width: 300px;
   }
   .head {
     text-align: center;
     margin-bottom: 10px;
     font-size: 22px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
   .avatar {
     width: 50px;
@@ -289,6 +482,19 @@
     .rows-container {
       max-width: 100%;
       overflow-x: scroll;
+    }
+    .user-page-container .stats-container {
+      flex-direction: column;
+    }
+    .user-page-container .stats-container .stats {
+      width: 100%;
+      max-width: 85%;
+    }
+    .first-trade-info {
+      margin: 0.75rem 0 0.25rem;
+    }
+    .last-trade-info {
+      margin: -0.25rem 0 1rem;
     }
   }
 </style>
