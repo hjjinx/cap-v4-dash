@@ -13,7 +13,7 @@ const PositionStoreContract = new web3.eth.Contract(PositionStoreABI, PositionSt
 const OrderStoreContractAdd = '0xF75eFA4CB21529489877566ffE68229ffF89f456';
 const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContractAdd);
 
-const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.0.9'
+const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.1.3'
 
 export const getPositions = async () => {
   let positions = await PositionStoreContract.methods.getPositions(10000, 0).call((error: any) => {
@@ -213,4 +213,61 @@ export const getUsers = async () => {
 
 export const resolveEns = async (ensName: string) => {
   return web3Mainnet.eth.ens.getAddress(ensName)
+}
+
+export const getDaysData = async () => {
+  let days: any[] = []
+  let skipped = 0
+  const call = async (skip: number) => {
+    let _days = await fetch(GRAPH, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+            dayDatas(
+              skip: ${skip}
+              first: 1000
+              orderBy: id
+              orderDirection: asc
+              subgraphError: deny
+            ) {
+              id
+              volumeEth
+              volumeUsdc
+              numOrdersEth
+              numOrdersUsdc
+              numLiquidationsEth
+              liquidationMarginEth
+              liquidationVolumeEth
+              numLiquidationsUsdc
+              liquidationMarginUsdc
+              liquidationVolumeUsdc
+              traderPnlEth
+              traderPnlUsdc
+              totalFeesEth
+              poolFeesEth
+              stakingFeesEth
+              treasuryFeesEth
+              keeperFeesEth
+              totalFeesUsdc
+              poolFeesUsdc
+              stakingFeesUsdc
+              treasuryFeesUsdc
+              keeperFeesUsdc
+            }
+          }
+        `,
+      }),
+    }).then(res => res.json())
+    days.push(..._days?.data?.dayDatas)
+    if (_days?.data?.dayDatas?.length == 1000) {
+      skipped += 1000
+      await call(skipped)
+    }
+  }
+  await call(skipped)
+  return days;
 }

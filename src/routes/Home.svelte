@@ -5,22 +5,26 @@
   import { getPositions } from '../scripts/web3';
   import { prices } from "../scripts/stores";
   import { calculateUPLs } from '../scripts/utils';
+  import { getDaysData } from '../scripts/web3';
+  import Volume from './components/Bar.svelte';
+  import PnL from './components/PnL.svelte';
   
   let loading = true;
   let address = ''
 
   let positionsData: any[] = [];
+  let daysData: any[] = [];
   onMount(async () => {
     const updateUPLs = (_prices: any[]) => {
       calculateUPLs(positionsData, _prices)
-      loading = false;
     }
     positionsData = await getPositions()
     if ($prices['ETH-USD']) updateUPLs($prices)
-    loading = false;
+    daysData = await getDaysData()
     prices.subscribe(_prices => {
       if (_prices['ETH-USD']) updateUPLs(_prices)
     })
+    loading = false;
   });
 
 
@@ -41,6 +45,12 @@
     <button on:click={() => address.length ? window.location.href = `/#/user/${address}` : null}>Submit</button>
   </div>
   <div class="flex-container">
+    <div class="chart">
+      <Volume data={daysData} />
+    </div>
+    <div class="chart">
+      <PnL data={daysData} />
+    </div>
     <div class="chart">
       <Scatter data={positionsData} />
     </div>

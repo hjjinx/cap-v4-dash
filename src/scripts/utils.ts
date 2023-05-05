@@ -185,3 +185,32 @@ export function formatPnl(pnl: number, isPercent: boolean) {
 	if (isPercent) string += '%';
 	return string;
 }
+
+export function timeConverter(timestamp: number) {
+  var a = new Date(timestamp);
+  var months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var dat = a.getDate();
+  var time = dat + ' ' + month + ' ' + year;
+  return time;
+}
+
+export function formatDate(date: Date) {
+  const month = '' + (date.getMonth() + 1);
+  const day = '' + date.getDate();
+  return `${day}/${month}`;
+}
