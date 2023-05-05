@@ -244,7 +244,6 @@
           </g>
         {/each}
       </g>
-      {#if xHover || xHover == 0}
         <!-- <g class="ma-7">
           {#each ma7 as maPoint, i}
             <line
@@ -261,7 +260,7 @@
           {#each pointsCum as point, i}
             <line
               class="cum-line"
-              class:transparent={barHover}
+              class:transparent={!xHover || barHover}
               x1={xScale(i)}
               x2={xScale(i + 1)}
               y1={yCumScale(pointsCum[i].y)}
@@ -270,7 +269,6 @@
             />
           {/each}
         </g>
-      {/if}
     </svg>
   </div>
 {/if}
