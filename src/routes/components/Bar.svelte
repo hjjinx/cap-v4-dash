@@ -1,49 +1,55 @@
-<script lang='ts'>
-  import { scaleLinear } from 'd3-scale';
-  import { SPINNER_ICON } from '../../scripts/icons';
-  import { onMount } from 'svelte';
-  import { prices } from '../../scripts/stores';
-  import { ETH, USDC } from '../../scripts/constants';
+<script lang="ts">
+  import { scaleLinear } from "d3-scale";
+  import { SPINNER_ICON } from "../../scripts/icons";
+  import { onMount } from "svelte";
+  import { prices } from "../../scripts/stores";
+  import { ETH, USDC } from "../../scripts/constants";
   import {
     numberWithCommas,
     timeConverter,
     formatDate,
     priceTickFormatter,
     priceFormatter,
-  } from '../../scripts/utils';
+  } from "../../scripts/utils";
 
   export let data: any[];
   let loading = true;
   let points: any[] = [];
+  let pointsCum: any[] = [];
   let xValues = [];
   //   let BTCPrice;
   let ETHPrice: number;
   let xTicks: any[] = [];
   let yTicks: any[] = [];
+  let cumYTicks: any[] = [];
   let ma7: any[] = [];
+  let maxCumY: any = 0;
   onMount(async () => {
-    ETHPrice = $prices['ETH-USD'][0]
+    ETHPrice = $prices["ETH-USD"][0];
+    pointsCum.push({ x: 1676937513600, yETH: 0, yUSD: 0, y: 0 });
     for (let element of data) {
       points.push({ x: parseInt(element.id) });
+      pointsCum.push({ x: parseInt(element.id) });
       xValues.push(parseInt(element.id));
 
-      points[points.length - 1].yETH = priceFormatter(
-        element.volumeEth, ETH
-      );
-      points[points.length - 1].yUSD = priceFormatter(
-        element.volumeUsdc, USDC
-      );
+      points[points.length - 1].yETH = priceFormatter(element.volumeEth, ETH);
+      points[points.length - 1].yUSD = priceFormatter(element.volumeUsdc, USDC);
       points[points.length - 1].y =
         ETHPrice * points[points.length - 1].yETH +
         points[points.length - 1].yUSD;
-    }
 
+      pointsCum[pointsCum.length - 1].yETH =
+        points[points.length - 1].yETH + pointsCum[pointsCum.length - 2].yETH;
+      pointsCum[pointsCum.length - 1].yUSD =
+        points[points.length - 1].yUSD + pointsCum[pointsCum.length - 2].yUSD;
+      pointsCum[pointsCum.length - 1].y =
+        points[points.length - 1].y + pointsCum[pointsCum.length - 2].y;
+    }
     const maxY = Math.max(...points.map((i) => i.y));
+    maxCumY = Math.max(...pointsCum.map((i) => i.y));
     for (let i = 1; i <= 6; i++) {
       xTicks.push(
-        new Date(
-          points[Math.round(((points.length - 1) * (i - 1)) / 5)].x
-        )
+        new Date(points[Math.round(((points.length - 1) * (i - 1)) / 5)].x)
       );
     }
 
@@ -52,7 +58,12 @@
       .range([height - padding.bottom, padding.top])
       .nice()
       .ticks(6);
-
+    cumYTicks = scaleLinear()
+      .domain([0, maxCumY])
+      .range([height - padding.bottom, padding.top])
+      .nice()
+      .ticks(6);
+    console.log(cumYTicks);
     let ma6 = 0;
     for (let i = 1; i <= 6; i++) {
       ma6 += points[i].y;
@@ -78,13 +89,18 @@
     .domain([0, Math.max.apply(null, yTicks)])
     .range([height - padding.bottom, padding.top]);
 
+  $: yCumScale = scaleLinear()
+    .domain([0, maxCumY])
+    .range([height - padding.bottom, padding.top]);
+
   $: innerWidth = width - (padding.left + padding.right);
-  $: barWidth = xValues.length ? Number((innerWidth / xValues.length).toFixed(3)) : 0;
+  $: barWidth = xValues.length
+    ? Number((innerWidth / xValues.length).toFixed(3))
+    : 0;
 
-  $: focus = false;
-
-  $: activePoint = 0 as any;
-  $: date = '';
+  $: xHover = null as any;
+  $: barHover = null as any;
+  $: date = "";
 </script>
 
 {#if loading}
@@ -95,33 +111,50 @@
     <center><h1>Building Graph</h1></center>
   </div>
 {:else}
-  {#if activePoint == 0}
+  {#if !xHover}
     <h3>Volume in USD</h3>
-  {:else}
+  {:else if barHover}
     <h3>
       {date} | Ξ:
       <span class="volumeETH"
-        >{numberWithCommas(Math.round(activePoint.yETH))}</span
+        >{numberWithCommas(Math.round(barHover.yETH))}</span
       >
       | USDC:
       <span class="volumeUSDC"
-        >{numberWithCommas(Math.round(activePoint.yUSD))}$</span
+        >{numberWithCommas(Math.round(barHover.yUSD))}$</span
+      >
+    </h3>
+  {:else}
+    <h3>
+      {timeConverter(xHover.x)} | Ξ:
+      <span class="volumeETH"
+        >{numberWithCommas(Math.round(xHover.yETH))}</span
+      >
+      | USDC:
+      <span class="volumeUSDC"
+        >{numberWithCommas(Math.round(xHover.yUSD))}$</span
       >
     </h3>
   {/if}
   <div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
     <svg
-      on:mouseenter={() => {
-        focus = true;
+      on:mousemove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const index = Number(xScale.invert(x).toFixed(0))
+        if (index > points.length - 1 || index < 0) {
+          xHover = null
+          return
+        }
+        xHover = pointsCum[index]
       }}
       on:mouseleave={() => {
-        focus = false;
-        activePoint = 0;
+        xHover = null;
       }}
       style="overflow: visible"
     >
       <!-- y axis -->
-      {#if activePoint == 0}
+      {#if !xHover}
         <g class="axis y-axis">
           {#each yTicks as tick}
             <g
@@ -129,20 +162,35 @@
               transform="translate(0, {yScale(tick) || 0})"
             >
               <line x2="100%" style="transform: scaleX(1.01)" />
-              <text y="-4" class="y-axisText">{priceTickFormatter(tick)}</text>
+              <text y="-4" class="y-axisText">{priceTickFormatter(tick)}</text
+              >
             </g>
           {/each}
+        </g>
+      {:else if barHover}
+        <g class="axis selected">
+          <g
+            class="tick selected"
+            transform="translate(0,{yScale(barHover.y) || 0})"
+          >
+            <line x2="100%" />
+            <text class="y-axisText selected"
+              >{priceTickFormatter(
+                barHover.yETH * ETHPrice + barHover.yUSD
+              )}</text
+            >
+          </g>
         </g>
       {:else}
         <g class="axis selected">
           <g
             class="tick selected"
-            transform="translate(0,{yScale(activePoint.y) || 0})"
+            transform="translate(0,{yCumScale(xHover.y) || 0})"
           >
             <line x2="100%" />
             <text class="y-axisText selected"
               >{priceTickFormatter(
-                activePoint.yETH * ETHPrice + activePoint.yUSD
+                xHover.yETH * ETHPrice + xHover.yUSD
               )}</text
             >
           </g>
@@ -163,13 +211,16 @@
       </g>
 
       <!--bars-->
-      <g class={focus == true ? 'inactive' : 'active'}>
+      <g class={(xHover || xHover == 0) ? "inactive" : "active"}>
         {#each points as point, i}
           <g
             class="stacked-bar"
             on:mouseenter={() => {
-              activePoint = point;
+              barHover = point;
               date = timeConverter(point.x);
+            }}
+            on:mouseleave={() => {
+              barHover = null;
             }}
           >
             <!-- ETH bar: -->
@@ -193,8 +244,8 @@
           </g>
         {/each}
       </g>
-      {#if focus == true}
-        <g class="ma-7">
+      {#if xHover || xHover == 0}
+        <!-- <g class="ma-7">
           {#each ma7 as maPoint, i}
             <line
               class="ma7-line"
@@ -205,6 +256,19 @@
               stroke-width="0.3%"
             />
           {/each}
+        </g> -->
+        <g class="cum-line">
+          {#each pointsCum as point, i}
+            <line
+              class="cum-line"
+              class:transparent={barHover}
+              x1={xScale(i)}
+              x2={xScale(i + 1)}
+              y1={yCumScale(pointsCum[i].y)}
+              y2={yCumScale(pointsCum[i + 1]?.y || pointsCum[i]?.y)}
+              stroke-width="0.3%"
+            />
+          {/each}
         </g>
       {/if}
     </svg>
@@ -212,9 +276,16 @@
 {/if}
 
 <style>
+  .cum-line {
+    stroke: orange;
+    opacity: 1;
+  }
   .ma7-line {
     stroke: orange;
     opacity: 1;
+  }
+  line.transparent {
+    opacity: 0.2;
   }
   h3 {
     color: var(--sonic-silver);
@@ -243,7 +314,6 @@
     stroke: #e2e2e2;
     stroke-dasharray: 2;
   }
-
 
   .tick.tick-0 line {
     stroke-dasharray: 0;
