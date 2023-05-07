@@ -1,3 +1,4 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script defer lang="ts">
   import { onMount } from "svelte";
   import Modal from "./Modal.svelte";
@@ -5,24 +6,41 @@
   import { SPINNER_ICON, DOWNLOAD_ICON, CAP_LOGO } from "../../../scripts/icons";
   import { getUPL, formatPnl, numberWithCommas, priceFormatter, getPriceDenominator } from "../../../scripts/utils";
   import { prices } from "../../../scripts/stores";
-  import milady from '../../../images/milady_1.jpg';
+  import rocket from '../../../images/rocket.jpg';
+  import milady_1 from '../../../images/milady_1.jpg';
+  import chud_1 from '../../../images/chud1.jpg';
 
   export let data: any;
   let imageData: any;
   onMount(async () => {
+    changeBackground(chud_1)
+  });
+
+  const changeBackground = (bg: string) => {
+    document.getElementById('banner-bg')!.src = bg;
+    document.getElementById("trade-loader-container")!.style.display = 'flex';
+    document.getElementById("canvas-content")!.style.display = 'flex';
+    document.getElementById("download-icon")!.style.display = "none";
+    document.getElementById("bg-selection")!.style.display = "none";
+    const imageCreated = document.getElementById('final-banner')
+    if (imageCreated) {
+      imageCreated.remove()
+    }
     domtoimage
       .toPng(document.getElementById("canvas-content"))
       .then((dataUrl) => {
         imageData = dataUrl;
         var img = new Image();
         img.src = dataUrl;
+        img.style.height = "65vh";
         img.id = 'final-banner'
         document.getElementById("canvas").appendChild(img);
-        document.getElementById("canvas-content").remove();
-        document.getElementById("trade-loader-container").remove();
+        document.getElementById("trade-loader-container")!.style.display = 'none';
+        document.getElementById("canvas-content")!.style.display = 'none';
         document.getElementById("download-icon").style.display = "flex";
+        document.getElementById("bg-selection")!.style.display = "flex";
       });
-  });
+  }
 
   const downloadIcon = () => {
     fetch(imageData)
@@ -40,10 +58,21 @@
 
 <Modal title="Share Position" width={screen.height / 2 + 50}>
   <body>
+    <div class='bg-selection' id='bg-selection'>
+      <div class='bg-selection-container' on:click={() => changeBackground(rocket)}>
+        <img src={rocket} class='bg' alt='rocket'/>
+      </div>
+      <div class='bg-selection-container' on:click={() => changeBackground(milady_1)}>
+        <img src={milady_1} class='bg' alt='milady'/>
+      </div>
+      <div class='bg-selection-container' on:click={() => changeBackground(chud_1)}>
+        <img src={chud_1} class='bg' alt='chud'/>
+      </div>
+    </div>
     <div id="canvas">
       <div class="container" id="canvas-content">
         <div class='bg-container'>
-          <img src={milady} class='bg' alt=''/>
+          <img src={chud_1} class='bg' alt='' id='banner-bg'/>
         </div>
         <div class="cap-logo">
           {@html CAP_LOGO}
@@ -95,16 +124,43 @@
     font-family: "Inter var", sans-serif;
     display: flex;
     justify-content: center;
+    flex-direction: column;
   }
   #canvas {
     width: 948px;
     position: relative;
-    /* background-image: url("a.jpg"); */
     background-repeat: no-repeat;
     display: flex;
     z-index: 0;
     justify-content: center;
+    max-width: 100%;
   }
+  .bg-selection {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0 0;
+    margin-bottom: -5px;
+  }
+  .bg-selection .bg {
+    width: 50px;
+    height: 75px;
+    border: 1px solid var(--layer200);
+    margin: 2px 10px;
+  }
+  .bg-selection > .bg-selection-container {
+    cursor: pointer;
+  }
+  .bg-selection > .bg-selection-container > img {
+    border: 1px solid var(--primary);
+    opacity: 0.5;
+    transition: 1s;
+  }
+  .bg-selection > .bg-selection-container > img:hover {
+    opacity: 1;
+  } 
   .bg-container {
     width: 948px; 
     height: 1422px; 
