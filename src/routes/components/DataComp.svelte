@@ -107,11 +107,14 @@
       </div>
       <div
         class="column column-liqprice"
-        on:click={() => changeSort('orderType')}
+        on:click={() => changeSort('type')}
       >
         Type <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
-        >{sortBy == 'orderType' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
+        >{sortBy == 'type' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
       >
+      </div>
+      <div class='column'>
+        Share
       </div>
     {/if}
     <div class="column column-close" />
@@ -249,6 +252,15 @@
             <div class="column column-liqprice">
               {position.type}
             </div>
+            <div class="column" title={`Share`}>
+              <!-- svelte-ignore a11y-missing-attribute -->
+                <a 
+                  class:hide={position.type != "Position Liquidated" && position.type != "Position Decreased"} 
+                  on:click|stopPropagation={() => { sharePositionModal.set({...position, isClose: true}) }}
+                >
+                  {@html SHARE_ICON}
+                </a>
+            </div>
           {/if}
         </div>
       {/each}
@@ -379,4 +391,8 @@
 		color: var(--primary);
 		text-decoration: none;
 	}
+  a.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
 </style>

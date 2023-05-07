@@ -53,7 +53,9 @@
       })
       .catch(console.error);
   };
-  let pnl = (getUPL(data, $prices[data.market][0]) * 100) / (data.margin / getPriceDenominator(data.asset));
+  let pnl = data.isClose 
+    ? data.type != "Position Liquidated" ? (data.pnl * 100 / data.margin).toFixed(2) : -100
+    : (getUPL(data, $prices[data.market][0]) * 100) / (data.margin / getPriceDenominator(data.asset));
 </script>
 
 <Modal title="Share Position" width={screen.height / 2 + 50}>
@@ -89,14 +91,25 @@
             {formatPnl(pnl, true)}
           </p>
           <div class="position-price-container">
-            <div>
-              <div class="price-heading">Entry Price</div>
-              <div class="price">{numberWithCommas(priceFormatter(data.price).toFixed(2))}</div>
-            </div>
-            <div style="margin-left: 1.5em">
-              <div class="price-heading">Mark Price</div>
-              <div class="price">{numberWithCommas($prices[data.market][0].toFixed(2))}</div>
-            </div>
+            {#if data.isClose}
+              <div>
+                <div class="price-heading">Leverage</div>
+                <div class="price">{data.leverage.toFixed(0)}x</div>
+              </div>
+              <div style="margin-left: 1.5em">
+                <div class="price-heading">Close Price</div>
+                <div class="price">{numberWithCommas(priceFormatter(data.price).toFixed(2))}</div>
+              </div>
+            {:else}
+              <div>
+                <div class="price-heading">Entry Price</div>
+                <div class="price">{numberWithCommas(priceFormatter(data.price).toFixed(2))}</div>
+              </div>
+              <div style="margin-left: 1.5em">
+                <div class="price-heading">Mark Price</div>
+                <div class="price">{numberWithCommas($prices[data.market][0].toFixed(2))}</div>
+              </div>
+            {/if}
           </div>
         </div>
         <div class="ref-container">
