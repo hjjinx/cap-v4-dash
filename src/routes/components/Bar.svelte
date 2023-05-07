@@ -115,7 +115,9 @@
     <h3>Volume in USD</h3>
   {:else if barHover}
     <h3>
-      {date} | Ξ:
+      <span class="pos"
+        >{numberWithCommas(Math.round(barHover.y))}</span
+      > | Ξ:
       <span class="volumeETH"
         >{numberWithCommas(Math.round(barHover.yETH))}</span
       >
@@ -126,7 +128,9 @@
     </h3>
   {:else}
     <h3>
-      {timeConverter(xHover.x)} | Ξ:
+      <span class="pos"
+        >{numberWithCommas(Math.round(xHover.y))}</span
+      > | Ξ:
       <span class="volumeETH"
         >{numberWithCommas(Math.round(xHover.yETH))}</span
       >
@@ -141,11 +145,9 @@
       on:mousemove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
-        const index = Number(xScale.invert(x).toFixed(0))
-        if (index > points.length - 1 || index < 0) {
-          xHover = null
-          return
-        }
+        let index = Number(xScale.invert(x).toFixed(0))
+        if (index > points.length - 1) index = points.length - 1
+        else if (index < 0) index = 0
         xHover = pointsCum[index]
       }}
       on:mouseleave={() => {
@@ -173,12 +175,18 @@
             class="tick selected"
             transform="translate(0,{yScale(barHover.y) || 0})"
           >
-            <line x2="100%" />
+            <line x2={points.findIndex((x) => x == barHover) * 100 / points.length + '%'} />
             <text class="y-axisText selected"
               >{priceTickFormatter(
                 barHover.yETH * ETHPrice + barHover.yUSD
               )}</text
             >
+            <text class="y-axisText selected" fill='white'
+              x={xScale(points.findIndex((x) => x == barHover)) - 25}
+              y={-1 * yScale(barHover.y) + height || 0}
+            >
+              {timeConverter(barHover.x)}
+            </text>
           </g>
         </g>
       {:else}
@@ -187,27 +195,42 @@
             class="tick selected"
             transform="translate(0,{yCumScale(xHover.y) || 0})"
           >
-            <line x2="100%" />
+            <line x2={pointsCum.findIndex((x) => x == xHover) * 100 / pointsCum.length + '%'} />
             <text class="y-axisText selected"
-              >{priceTickFormatter(
-                xHover.yETH * ETHPrice + xHover.yUSD
+            >{priceTickFormatter(
+              xHover.yETH * ETHPrice + xHover.yUSD
               )}</text
             >
+            <line 
+              x1={xScale(pointsCum.findIndex((x) => x == xHover))}
+              x2={xScale(pointsCum.findIndex((x) => x == xHover))}
+              y1={yCumScale(xHover.y).toFixed(2) || 0}
+              y2={yCumScale(0).toFixed(2) || 0}
+              transform="translate(0,{-1 * yCumScale(xHover.y) || 0})"
+            />
+            <text class="y-axisText selected"
+              x={xScale(pointsCum.findIndex((x) => x == xHover)) - 30}
+              y={-1 * yCumScale(xHover.y) + height || 0}
+            >
+              {timeConverter(xHover.x)}
+            </text>
           </g>
         </g>
       {/if}
       <!-- x axis -->
       <g class="axis x-axis">
-        {#each xTicks as xTick, i}
-          <g
-            class="tick"
-            transform="translate({xScale(
-              (i * points.length) / (xTicks.length - 1)
-            )},{height})"
-          >
-            <text x={barWidth / 2} y="-4">{formatDate(xTick)}</text>
-          </g>
-        {/each}
+        {#if !xHover}
+          {#each xTicks as xTick, i}
+            <g
+              class="tick"
+              transform="translate({xScale(
+                (i * points.length) / (xTicks.length - 1)
+              )},{height})"
+            >
+              <text x={barWidth / 2} y="-4">{formatDate(xTick)}</text>
+            </g>
+          {/each}
+        {/if}
       </g>
 
       <!--bars-->
@@ -306,6 +329,7 @@
   .tick {
     font-size: 0.725em;
     font-weight: 200;
+    fill: var(--layer500);
   }
 
   .tick line {
@@ -356,6 +380,7 @@
   }
   .y-axisText.selected {
     transform: translate(0px, -4px);
+    fill: var(--layer500)
   }
 
   .volumeETH {
