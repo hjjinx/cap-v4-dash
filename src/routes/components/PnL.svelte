@@ -247,7 +247,6 @@
   }
 
   .tick {
-    font-family: Helvetica, Arial;
     font-size: 0.725em;
     font-weight: 200;
   }
@@ -258,7 +257,7 @@
   }
 
   .tick text {
-    fill: #ccc;
+    fill: #999;
     text-anchor: start;
   }
 
@@ -313,7 +312,4 @@
     transform: translate(-5px, 0);
   }
 
-  .y-axisText {
-    font-family: 'Times New Roman', Times, serif;
-  }
 </style>
