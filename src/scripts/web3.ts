@@ -57,7 +57,7 @@ export const getUserHistory = async (address: string) => {
   let orders: any[] = []
   let skipped = 0
   const call = async (skip: number) => {
-    let _orders = await fetch('https://api.studio.thegraph.com/query/43986/cap-subgraph/0.0.7', {
+    let _orders = await fetch(GRAPH, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export const getUserHistory = async (address: string) => {
                 subgraphError: deny
               ) {
                 id
-                orderId
+                type
                 user
                 asset
                 market
@@ -85,14 +85,12 @@ export const getUserHistory = async (address: string) => {
                 price
                 fee
                 isLong
-                orderType
-                isReduceOnly
-                expiry
-                cancelOrderId
+                pnl
+                pnlUsd
+                orderId
                 blockNumber
                 blockTimestamp
                 transactionHash
-                wasCancelled
               }
             }
           `,

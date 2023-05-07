@@ -1,7 +1,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang='ts'>
   import { onMount } from "svelte";
-  import { getOrderType, getPriceDenominator, numberWithCommas, priceFormatter } from "../../scripts/utils";
+  import { getPriceDenominator, numberWithCommas, priceFormatter } from "../../scripts/utils";
   import { ETH } from "../../scripts/constants";
   import { prices, sharePositionModal, showPositionInfoModal } from "../../scripts/stores";
   import {SHARE_ICON} from '../../scripts/icons';
@@ -100,9 +100,9 @@
         >{sortBy == 'blockTimestamp' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
       >
       </div>
-      <div class="column column-pnl" on:click={() => changeSort('isReduceOnly')}>
-        Reduce Only <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
-        >{sortBy == 'isReduceOnly' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
+      <div class="column column-pnl" on:click={() => changeSort('pnlUsd')}>
+        PnL <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
+        >{sortBy == 'pnlUsd' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
       >
       </div>
       <div
@@ -219,21 +219,35 @@
               {/if}
             </div>
             <div class="column column-liqprice">
-              {getOrderType(parseInt(position.orderType))}
+              {position.type}
             </div>
           {:else if dataType == 'history'}
             <div class="column column-leverage" title={`${new Date(position.blockTimestamp * 1000).toDateString()} ${new Date(position.blockTimestamp * 1000).toLocaleTimeString()}`}>
               {new Date(position.blockTimestamp * 1000).toDateString().slice(3)}
             </div>
-            <div class={`column column-pnl`}>
-              {#if position.isReduceOnly}
-                Yes
+            <div class={`column column-pnl ${
+              position.type == "Position Liquidated" 
+                ? 'neg' 
+                : position.type == "Position Decreased"
+                  ? position.pnl > 0 ? 'pos' : 'neg'
+                  : ''
+            }`}>
+              {#if position.type == "Position Liquidated"}
+                {priceFormatter(
+                  position.margin,
+                  position.asset
+                )}{position.asset == ETH ? 'Ξ' : '$'} (-100%)
+              {:else if position.type == "Position Decreased"}
+                {priceFormatter(
+                  position.pnl,
+                  position.asset
+                )}{position.asset == ETH ? 'Ξ' : '$'} ({(position.pnl * 100 / position.margin).toFixed(2)}%)
               {:else}
-                No
+                -
               {/if}
             </div>
             <div class="column column-liqprice">
-              {getOrderType(parseInt(position.orderType))}
+              {position.type}
             </div>
           {/if}
         </div>
@@ -304,6 +318,9 @@
   }
   .column-wasliq {
     width: 5%;
+  }
+  .column-liqprice {
+    width: 20%
   }
   @media (max-width: 1200px) {
     .pnl-percent {
