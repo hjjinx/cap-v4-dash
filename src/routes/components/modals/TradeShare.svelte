@@ -8,12 +8,15 @@
   import { prices } from "../../../scripts/stores";
   import rocket from '../../../images/rocket.jpg';
   import milady_1 from '../../../images/milady_1.jpg';
+  import milady_4 from '../../../images/milady4.png';
+  import milady_5 from '../../../images/milady5.png';
   import chud_1 from '../../../images/chud1.jpg';
+  import remilio1 from '../../../images/remilio.png';
 
   export let data: any;
   let imageData: any;
   onMount(async () => {
-    changeBackground(chud_1)
+    changeBackground(milady_4)
   });
 
   const changeBackground = (bg: string) => {
@@ -65,10 +68,19 @@
         <img src={rocket} class='bg' alt='rocket'/>
       </div>
       <div class='bg-selection-container' on:click={() => changeBackground(milady_1)}>
-        <img src={milady_1} class='bg' alt='milady'/>
+        <img src={milady_1} class='bg' alt='milady_1'/>
+      </div>
+      <div class='bg-selection-container' on:click={() => changeBackground(milady_4)}>
+        <img src={milady_4} class='bg' alt='milady_4'/>
+      </div>
+      <div class='bg-selection-container' on:click={() => changeBackground(milady_5 )}>
+        <img src={milady_5} class='bg' alt='milady_5'/>
       </div>
       <div class='bg-selection-container' on:click={() => changeBackground(chud_1)}>
-        <img src={chud_1} class='bg' alt='chud'/>
+        <img src={chud_1} class='bg' alt='chud_1'/>
+      </div>
+      <div class='bg-selection-container' on:click={() => changeBackground(remilio1)}>
+        <img src={remilio1} class='bg' alt='remilio1'/>
       </div>
     </div>
     <div id="canvas">
@@ -78,7 +90,7 @@
         </div>
         <div class="cap-logo">
           {@html CAP_LOGO}
-          <span class="cap-logo-text">CAP Protocol</span>
+          <span class="cap-logo-text">cap.io</span>
         </div>
         <div class="position-container">
           <p class="white-large">
@@ -259,6 +271,8 @@
     display: flex;
     flex-direction: column;
     align-self: center;
+    padding-top: 20px;
+    border-top: 10px solid var(--primary);
   }
   .ref-p {
     color: #9499a1;
@@ -310,10 +324,16 @@
       --modal-width: 350px!important;
     }
     .address {
-      font-size: 32px;
+      font-size: 30px;
     }
     .ref-p {
       font-size: 40px;
+    }
+    .bg-selection .bg {
+      width: 30px;
+      height: 50px;
+      border: 1px solid var(--layer200);
+      margin: 2px 10px;
     }
   }
 </style>
