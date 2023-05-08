@@ -309,5 +309,11 @@
     :global(.modal) {
       --modal-width: 350px!important;
     }
+    .address {
+      font-size: 32px;
+    }
+    .ref-p {
+      font-size: 40px;
+    }
   }
 </style>
