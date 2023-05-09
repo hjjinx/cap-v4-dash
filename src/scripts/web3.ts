@@ -13,7 +13,7 @@ const PositionStoreContract = new web3.eth.Contract(PositionStoreABI, PositionSt
 const OrderStoreContractAdd = '0xF75eFA4CB21529489877566ffE68229ffF89f456';
 const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContractAdd);
 
-const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.1.3'
+const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.1.5'
 
 export const getPositions = async () => {
   let positions = await PositionStoreContract.methods.getPositions(10000, 0).call((error: any) => {
