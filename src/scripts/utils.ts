@@ -102,10 +102,10 @@ export const getPriceDenominator = (asset: string) =>
 
 export function priceTickFormatter(num: number) {
   const unsignedNum = Math.abs(num);
-  if (unsignedNum > 1000000000) {
+  if (unsignedNum >= 1000000000) {
     return parseFloat((num / 1000000000).toFixed(1)) + "B";
-  } else if (unsignedNum > 1000000) {
-    return parseFloat((num / 1000000).toFixed(0)) + "M";
+  } else if (unsignedNum >= 1000000) {
+    return parseFloat((num / 1000000).toFixed(1)) + "M";
   } else if (unsignedNum > 999 && unsignedNum < 1000000) {
     return parseFloat((num / 1000).toFixed(1)) + "K";
   } else {

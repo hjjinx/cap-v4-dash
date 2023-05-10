@@ -21,7 +21,6 @@
   let ETHPrice: number;
   let xTicks: any[] = [];
   let yTicks: any[] = [];
-  let cumYTicks: any[] = [];
   let ma7: any[] = [];
   let maxCumY: any = 0;
   onMount(async () => {
@@ -58,12 +57,6 @@
       .range([height - padding.bottom, padding.top])
       .nice()
       .ticks(6);
-    cumYTicks = scaleLinear()
-      .domain([0, maxCumY])
-      .range([height - padding.bottom, padding.top])
-      .nice()
-      .ticks(6);
-    console.log(cumYTicks);
     let ma6 = 0;
     for (let i = 1; i <= 6; i++) {
       ma6 += points[i].y;
@@ -146,7 +139,7 @@
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         let index = Number(xScale.invert(x).toFixed(0))
-        if (index > points.length - 1) index = points.length - 1
+        if (index > points.length) index = points.length
         else if (index < 0) index = 0
         xHover = pointsCum[index]
       }}
@@ -155,68 +148,6 @@
       }}
       style="overflow: visible"
     >
-      <!-- y axis -->
-      {#if !xHover}
-        <g class="axis y-axis">
-          {#each yTicks as tick}
-            <g
-              class="tick tick-{tick}"
-              transform="translate(0, {yScale(tick) || 0})"
-            >
-              <line x2="100%" style="transform: scaleX(1.01)" />
-              <text y="-4" class="y-axisText">{priceTickFormatter(tick)}</text
-              >
-            </g>
-          {/each}
-        </g>
-      {:else if barHover}
-        <g class="axis selected">
-          <g
-            class="tick selected"
-            transform="translate(0,{yScale(barHover.y) || 0})"
-          >
-            <line x2={points.findIndex((x) => x == barHover) * 100 / points.length + '%'} />
-            <text class="y-axisText selected"
-              >{priceTickFormatter(
-                barHover.yETH * ETHPrice + barHover.yUSD
-              )}</text
-            >
-            <text class="y-axisText selected" fill='white'
-              x={xScale(points.findIndex((x) => x == barHover)) - 25}
-              y={-1 * yScale(barHover.y) + height || 0}
-            >
-              {timeConverter(barHover.x)}
-            </text>
-          </g>
-        </g>
-      {:else}
-        <g class="axis selected">
-          <g
-            class="tick selected"
-            transform="translate(0,{yCumScale(xHover.y) || 0})"
-          >
-            <line x2={pointsCum.findIndex((x) => x == xHover) * 100 / pointsCum.length + '%'} />
-            <text class="y-axisText selected"
-            >{priceTickFormatter(
-              xHover.yETH * ETHPrice + xHover.yUSD
-              )}</text
-            >
-            <line 
-              x1={xScale(pointsCum.findIndex((x) => x == xHover))}
-              x2={xScale(pointsCum.findIndex((x) => x == xHover))}
-              y1={yCumScale(xHover.y).toFixed(2) || 0}
-              y2={yCumScale(0).toFixed(2) || 0}
-              transform="translate(0,{-1 * yCumScale(xHover.y) || 0})"
-            />
-            <text class="y-axisText selected"
-              x={xScale(pointsCum.findIndex((x) => x == xHover)) - 30}
-              y={-1 * yCumScale(xHover.y) + height || 0}
-            >
-              {timeConverter(xHover.x)}
-            </text>
-          </g>
-        </g>
-      {/if}
       <!-- x axis -->
       <g class="axis x-axis">
         {#if !xHover}
@@ -292,16 +223,74 @@
             />
           {/each}
         </g>
+        <!-- y axis -->
+        {#if !xHover}
+        <g class="axis y-axis">
+          {#each yTicks as tick}
+            <g
+              class="tick tick-{tick}"
+              transform="translate(0, {yScale(tick) || 0})"
+            >
+              <line x2="100%" style="transform: scaleX(1.01)" />
+              <text y="-4" class="y-axisText">{priceTickFormatter(tick)}</text
+              >
+            </g>
+          {/each}
+        </g>
+      {:else if barHover}
+        <g class="axis selected">
+          <g
+            class="tick selected"
+            transform="translate(0,{yScale(barHover.y) || 0})"
+          >
+            <line x2={(points.findIndex((x) => x == barHover) + 3) * barWidth} />
+            <text class="y-axisText selected"
+              >{priceTickFormatter(
+                barHover.yETH * ETHPrice + barHover.yUSD
+              )}</text
+            >
+            <text class="y-axisText selected" fill='white'
+              x={xScale(points.findIndex((x) => x == barHover)) - 25}
+              y={-1 * yScale(barHover.y) + height || 0}
+            >
+              {timeConverter(barHover.x)}
+            </text>
+          </g>
+        </g>
+      {:else}
+        <g class="axis selected">
+          <g
+            class="tick selected"
+            transform="translate(0,{yCumScale(xHover.y) || 0})"
+          >
+            <line x2={(pointsCum.findIndex((x) => x == xHover) + 3) * barWidth} />
+            <text class="y-axisText selected"
+            >{priceTickFormatter(
+              xHover.yETH * ETHPrice + xHover.yUSD
+              )}</text
+            >
+            <line 
+              x1={xScale(pointsCum.findIndex((x) => x == xHover))}
+              x2={xScale(pointsCum.findIndex((x) => x == xHover))}
+              y1={yCumScale(xHover.y).toFixed(2) || 0}
+              y2={yCumScale(0).toFixed(2) || 0}
+              transform="translate(0,{-1 * yCumScale(xHover.y) || 0})"
+            />
+            <text class="y-axisText selected"
+              x={xScale(pointsCum.findIndex((x) => x == xHover)) - 30}
+              y={-1 * yCumScale(xHover.y) + height || 0}
+            >
+              {timeConverter(xHover.x)}
+            </text>
+          </g>
+        </g>
+      {/if}
     </svg>
   </div>
 {/if}
 
 <style>
   .cum-line {
-    stroke: orange;
-    opacity: 1;
-  }
-  .ma7-line {
     stroke: orange;
     opacity: 1;
   }
