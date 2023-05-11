@@ -139,8 +139,8 @@
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         let index = Number(xScale.invert(x).toFixed(0))
-        if (index > points.length) index = points.length
-        else if (index < 0) index = 0
+        if (index > points.length + 1) index = null
+        else if (index < -1) index = null
         xHover = pointsCum[index]
       }}
       on:mouseleave={() => {

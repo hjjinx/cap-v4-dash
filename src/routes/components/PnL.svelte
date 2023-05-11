@@ -151,8 +151,8 @@
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         let index = Number(xScale.invert(x).toFixed(0))
-        if (index > points.length) index = points.length
-        else if (index < 0) index = 0
+        if (index > points.length + 1) index = null
+        else if (index < -1) index = null
         xHover = pointsCum[index]
       }}
       on:mouseleave={() => {
@@ -174,7 +174,7 @@
               <text x={barWidth / 2} y="-4">{formatDate(xTick)}</text>
             </g>
           {/each}
-          <g class="axis y-axis">
+          <g class="axis y-axis cumticks">
             {#each cumYTicks as tick}
               <g
                 class="tick tick-{tick}"
@@ -402,6 +402,12 @@
 
   .y-axis {
     transform: translate(-5px, 0);
+  }
+
+  @media (max-width: 768px) {
+    g.cumticks {
+      display: none;
+    }
   }
 
 </style>
