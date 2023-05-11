@@ -243,7 +243,7 @@
             class="tick selected"
             transform="translate(0,{yScale(barHover.y) || 0})"
           >
-            <line x2={(points.findIndex((x) => x == barHover) + 3) * barWidth} />
+            <line x1={0} x2={xScale(points.findIndex((x) => x == barHover)) + barWidth / 2} />
             <text class="y-axisText selected"
               >{priceTickFormatter(
                 barHover.yETH * ETHPrice + barHover.yUSD
@@ -263,7 +263,7 @@
             class="tick selected"
             transform="translate(0,{yCumScale(xHover.y) || 0})"
           >
-            <line x2={(pointsCum.findIndex((x) => x == xHover) + 3) * barWidth} />
+            <line x1={0} x2={xScale(pointsCum.findIndex((x) => x == xHover))} />
             <text class="y-axisText selected"
             >{priceTickFormatter(
               xHover.yETH * ETHPrice + xHover.yUSD
