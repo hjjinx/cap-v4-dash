@@ -1,4 +1,5 @@
 import { PUBLIC_INFURA_KEY } from '$env/static/public'
+import { PUBLIC_GRAPH_KEY } from '$env/static/public'
 import { PositionStore as PositionStoreABI, OrderStore as OrderStoreABI } from './abis.js'
 import Web3 from 'web3'
 import { getPriceDenominator } from './utils.js';
@@ -13,7 +14,8 @@ const PositionStoreContract = new web3.eth.Contract(PositionStoreABI, PositionSt
 const OrderStoreContractAdd = '0xF75eFA4CB21529489877566ffE68229ffF89f456';
 const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContractAdd);
 
-const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.1.5'
+// const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.1.7'
+const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
 
 export const getPositions = async () => {
   let positions = await PositionStoreContract.methods.getPositions(10000, 0).call((error: any) => {
