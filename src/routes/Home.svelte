@@ -8,6 +8,7 @@
   import { getDaysData } from '../scripts/web3';
   import Volume from './components/Bar.svelte';
   import PnL from './components/PnL.svelte';
+  import Fee from './components/Fee.svelte';
   
   let loading = true;
   let address = ''
@@ -50,6 +51,9 @@
     </div>
     <div class="chart">
       <PnL data={daysData} />
+    </div>
+    <div class="chart">
+      <Fee data={daysData} />
     </div>
     <div class="chart">
       <Scatter data={positionsData} />
