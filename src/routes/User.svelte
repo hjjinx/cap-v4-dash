@@ -10,6 +10,7 @@
   import { ETH, USDC } from "../scripts/constants";
   import ethSvg from '../images/eth.svg'
   import usdcSvg from '../images/usdc.svg'
+  import Line from "./components/Line.svelte";
 
   let loading = true;
   let user: string;
@@ -40,6 +41,9 @@
   let totalStakingFees = 0;
   let totalTreasuryFees = 0;
   let totalKeeperFees = 0;
+  let volumeEth = 0;
+  let volumeUsdc = 0;
+  let volumeTotal = 0;
   let uplEth = 0;
   let uplUsdc = 0;
   let totalUPL = 0;
@@ -74,7 +78,6 @@
     calculateUPLs(positions, $prices)
     orders = addDollarInfoToData(orders, $prices)
     history = addDollarInfoToData(history, $prices)
-    console.log(userStats)
 
     if (userStats) {
       grossPnlEth = Number((userStats.pnlEth / getPriceDenominator(ETH)).toFixed(3));
@@ -86,6 +89,9 @@
       
       totalFeesEth = Number((userStats.totalFeesEth / getPriceDenominator(ETH)).toFixed(3))
       totalFeesUsdc = Number((userStats.totalFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
+      volumeEth = Number((userStats.volumeEth / getPriceDenominator(ETH)).toFixed(3))
+      volumeUsdc = Number((userStats.volumeUsdc / getPriceDenominator(USDC)).toFixed(1))
+      volumeTotal = Number((volumeEth * $prices['ETH-USD'][0] + volumeUsdc).toFixed(1))
       poolFeesEth = Number((userStats.poolFeesEth / getPriceDenominator(ETH)).toFixed(3))
       poolFeesUsdc = Number((userStats.poolFeesUsdc / getPriceDenominator(USDC)).toFixed(1))
       stakingFeesEth = Number((userStats.stakingFeesEth / getPriceDenominator(ETH)).toFixed(3))
@@ -123,7 +129,7 @@
     totalUPL = Number(totalUPL.toFixed(1))
     loading = false
   })
-
+  
   $: dataSwitch = () => {
     switch (activeTab) {
       case 'positions':
@@ -187,45 +193,51 @@
           <div class={"eth head"}><img src={ethSvg} class='coin-icon'/></div>
           <div class="data-row">
             <div class="label">
+              Volume
+            </div>
+            <span class='white'>Ξ{numberWithCommas(volumeEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
               Gross PnL
             </div>
             <span class:pos={grossPnlEth > 0} class:neg={grossPnlEth < 0}>Ξ{numberWithCommas(grossPnlEth)}</span>
           </div>
           <div class="data-row">
             <div class="label">
-              Net PnL
-            </div>
-            <span class:pos={netPnlEth > 0} class:neg={netPnlEth < 0}>Ξ{numberWithCommas(netPnlEth)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
               Total Fee
             </div>
-            <span class:pos={totalFeesEth > 0} class:neg={totalFeesEth < 0}>Ξ{numberWithCommas(totalFeesEth)}</span>
+            <span class='yellow'>Ξ{numberWithCommas(totalFeesEth)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Pool Fee
             </div>
-            <span class:pos={poolFeesEth > 0} class:neg={poolFeesEth < 0}>Ξ{numberWithCommas(poolFeesEth)}</span>
+            <span class='yellow'>Ξ{numberWithCommas(poolFeesEth)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Staking Fee
             </div>
-            <span class:pos={stakingFeesEth > 0} class:neg={stakingFeesEth < 0}>Ξ{numberWithCommas(stakingFeesEth)}</span>
+            <span class='yellow'>Ξ{numberWithCommas(stakingFeesEth)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Treasury Fee
             </div>
-            <span class:pos={treasuryFeesEth > 0} class:neg={treasuryFeesEth < 0}>Ξ{numberWithCommas(treasuryFeesEth)}</span>
+            <span class='yellow'>Ξ{numberWithCommas(treasuryFeesEth)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Keeper Fee
             </div>
-            <span class:pos={keeperFeesEth > 0} class:neg={keeperFeesEth < 0}>Ξ{numberWithCommas(keeperFeesEth)}</span>
+            <span class='yellow'>Ξ{numberWithCommas(keeperFeesEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Net PnL
+            </div>
+            <span class:pos={netPnlEth > 0} class:neg={netPnlEth < 0}>Ξ{numberWithCommas(netPnlEth)}</span>
           </div>
           <div class="data-row">
             <div class="label">
@@ -238,45 +250,51 @@
           <div class={"eth head"}><img src={usdcSvg} class='coin-icon'/></div>
           <div class="data-row">
             <div class="label">
+              Volume
+            </div>
+            <span class='white'>${numberWithCommas(volumeUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
               Gross PnL
             </div>
             <span class:pos={grossPnlUsdc > 0} class:neg={grossPnlUsdc < 0}>${numberWithCommas(grossPnlUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
-              Net PnL
-            </div>
-            <span class:pos={netPnlUsdc > 0} class:neg={netPnlUsdc < 0}>${numberWithCommas(netPnlUsdc)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
               Total Fee
             </div>
-            <span class:pos={totalFeesUsdc > 0} class:neg={totalFeesUsdc < 0}>${numberWithCommas(totalFeesUsdc)}</span>
+            <span class='yellow'>${numberWithCommas(totalFeesUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Pool Fee 
             </div>
-            <span class:pos={poolFeesUsdc > 0} class:neg={poolFeesUsdc < 0}>${numberWithCommas(poolFeesUsdc)}</span>
+            <span class='yellow'>${numberWithCommas(poolFeesUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Staking Fee
             </div>
-            <span class:pos={stakingFeesUsdc > 0} class:neg={stakingFeesUsdc < 0}>${numberWithCommas(stakingFeesUsdc)}</span>
+            <span class='yellow'>${numberWithCommas(stakingFeesUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Treasury Fee 
             </div>
-            <span class:pos={treasuryFeesUsdc > 0} class:neg={treasuryFeesUsdc < 0}>${numberWithCommas(treasuryFeesUsdc)}</span>
+            <span class='yellow'>${numberWithCommas(treasuryFeesUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
               Keeper Fee
             </div>
-            <span class:pos={keeperFeesUsdc > 0} class:neg={keeperFeesUsdc < 0}>${numberWithCommas(keeperFeesUsdc)}</span>
+            <span class='yellow'>${numberWithCommas(keeperFeesUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Net PnL
+            </div>
+            <span class:pos={netPnlUsdc > 0} class:neg={netPnlUsdc < 0}>${numberWithCommas(netPnlUsdc)}</span>
           </div>
           <div class="data-row">
             <div class="label">
@@ -289,9 +307,45 @@
           <div class={"white head"}><img src={ethSvg} class='coin-icon'/> + <img src={usdcSvg} class='coin-icon'/></div>
           <div class="data-row">
             <div class="label">
+              Volume
+            </div>
+            <span class='white'>${numberWithCommas(volumeTotal)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
               Gross PnL
             </div>
             <span class:pos={grossPnlTotal > 0} class:neg={grossPnlTotal < 0}>${numberWithCommas(grossPnlTotal)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Fee 
+            </div>
+            <span class='yellow'>${numberWithCommas(totalTotalFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Pool Fee 
+            </div>
+            <span class='yellow'>${numberWithCommas(totalPoolFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Staking Fee
+            </div>
+            <span class='yellow'>${numberWithCommas(totalStakingFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Treasury Fee 
+            </div>
+            <span class='yellow'>${numberWithCommas(totalTreasuryFees)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Keeper Fee
+            </div>
+            <span class='yellow'>${numberWithCommas(totalKeeperFees)}</span>
           </div>
           <div class="data-row">
             <div class="label">
@@ -301,42 +355,15 @@
           </div>
           <div class="data-row">
             <div class="label">
-              Total Fee 
-            </div>
-            <span class:pos={totalTotalFees > 0} class:neg={totalTotalFees < 0}>${numberWithCommas(totalTotalFees)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
-              Pool Fee 
-            </div>
-            <span class:pos={poolFeesUsdc > 0} class:neg={poolFeesUsdc < 0}>${numberWithCommas(totalPoolFees)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
-              Staking Fee
-            </div>
-            <span class:pos={stakingFeesUsdc > 0} class:neg={stakingFeesUsdc < 0}>${numberWithCommas(totalStakingFees)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
-              Treasury Fee 
-            </div>
-            <span class:pos={treasuryFeesUsdc > 0} class:neg={treasuryFeesUsdc < 0}>${numberWithCommas(totalTreasuryFees)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
-              Keeper Fee
-            </div>
-            <span class:pos={keeperFeesUsdc > 0} class:neg={keeperFeesUsdc < 0}>${numberWithCommas(totalKeeperFees)}</span>
-          </div>
-          <div class="data-row">
-            <div class="label">
               UPL
             </div> 
             <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
           </div>
         </div>
       </div>
+      {#if volumeTotal > 1000}
+        <Line data={history}/>
+      {/if}
       <div class=history-container>
         <div class='account-nav'>
           <div class="nav">
@@ -496,5 +523,8 @@
     .last-trade-info {
       margin: -0.25rem 0 1rem;
     }
+  }
+  .yellow {
+    color: yellow
   }
 </style>
