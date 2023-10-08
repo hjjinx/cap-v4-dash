@@ -14,7 +14,7 @@ const PositionStoreContract = new web3.eth.Contract(PositionStoreABI, PositionSt
 const OrderStoreContractAdd = '0xF75eFA4CB21529489877566ffE68229ffF89f456';
 const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContractAdd);
 
-const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.1.7'
+const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.2.8'
 // const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
 
 export const getPositions = async () => {
