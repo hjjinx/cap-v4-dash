@@ -196,6 +196,7 @@ export const getUsers = async () => {
               stakingFeesUsdc
               treasuryFeesUsdc
               keeperFeesUsdc
+              lastTradedOn
             }
           }
           `,

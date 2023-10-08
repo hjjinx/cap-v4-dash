@@ -6,6 +6,7 @@
   import { getUsers } from "../scripts/web3";
   import { SPINNER_ICON } from "../scripts/icons";
   import { ETH, USDC } from "../scripts/constants";
+  import moment from 'moment';
 
   let data: any[] = [];
   let loading: boolean;
@@ -32,6 +33,7 @@
       user.totalVolume = Number((+user.volumeEth * $prices['ETH-USD'][0] + +user.volumeUsdc).toFixed(2));
       user.totalOrders = +user.numOrdersEth + +user.numOrdersUsdc;
       user.totalLiquidations = +user.numLiquidationsEth + +user.numLiquidationsUsdc;
+      user.lastTradedOn = user.lastTradedOn;
     }
   });
 
@@ -77,9 +79,9 @@
           >{sortBy == 'totalVolume' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
-        <div class="column column-orders" on:click={() => changeSort('totalLiquidations')} title='Number of Liquidations'>
-          Num Liq. <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
-          >{sortBy == 'totalLiquidations' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
+        <div class="column column-last-trade" on:click={() => changeSort('lastTradedOn')} title='Last Traded on'>
+          Last Trade <span class={sortOrder == 'asc' ? 'pos' : 'neg'}
+          >{sortBy == 'lastTradedOn' ? (sortOrder == 'asc' ? '↑' : '↓') : ''}</span
         >
         </div>
         <div class="column column-volume" on:click={() => changeSort('totalLiquidationMargin')} title='Margin liquidated'>
@@ -125,10 +127,10 @@
             <div class="column column-volume pos" title={`Ξ${numberWithCommas(user.volumeEth)} + $${numberWithCommas(user.volumeUsdc)}`}>
               ${numberWithCommas(user.totalVolume)}
             </div>
-            <div class="column column-orders" title={`ETH: ${numberWithCommas(user.numLiquidationsEth)} + USDC: ${numberWithCommas(user.numLiquidationsUsdc)}`}>
-              {numberWithCommas(user.totalLiquidations)}
+            <div class="column column-last-trade">
+              {moment((+user.lastTradedOn * 1000)).fromNow()}
             </div>
-            <div class="column column-volume" class:neg={user.totalLiquidations != 0} title={`Ξ${numberWithCommas(user.liquidationMarginEth)} + $${numberWithCommas(user.liquidationMarginUsdc)}`}>
+            <div class="column column-volume" class:neg={user.totalLiquidations != 0} title={`Liquidated ${user.totalLiquidations} times for: Ξ${numberWithCommas(user.liquidationMarginEth)} + $${numberWithCommas(user.liquidationMarginUsdc)}`}>
               ${numberWithCommas(user.totalLiquidationMargin)}
             </div>
             <div class="column column-volume pos" class:neg={user.grossPnl < 0}>
@@ -193,7 +195,10 @@
     cursor: pointer;
   }
   .column-orders {
-    width: 10%;
+    width: 8%;
+  }
+  .column-last-trade {
+    width: 15%;
   }
   .column-product {
     width: 12.5%;
