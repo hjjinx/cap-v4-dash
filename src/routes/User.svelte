@@ -2,7 +2,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang='ts'>
   import { onMount } from "svelte";
-  import { getUserHistory, getUserOpenOrders, getUserPositions, getUserStats, resolveEns } from '../scripts/web3';
+  import { getUserHistory, getUserOpenOrders, getUserPositions, getUserStats, resolveEns, getUnclaimedStakingRewards } from '../scripts/web3';
   import { ARBISCAN_ICON, DE_BANK_ICON, SPINNER_ICON } from "../scripts/icons";
   import DataComp from "./components/DataComp.svelte";
   import { prices } from "../scripts/stores";
@@ -20,6 +20,7 @@
   let orders: any[] = []
   let history: any[] = []
   let userStats: any;
+  let unclaimedRewards: any;
   let grossPnlEth = 0;
   let grossPnlUsdc = 0;
   let grossPnlTotal = 0;
@@ -47,8 +48,18 @@
   let uplEth = 0;
   let uplUsdc = 0;
   let totalUPL = 0;
-  let firstTradeDate: string | null | number = new Date().getTime() * 1000
+  let firstTradeDate: string | null | number = null
   let lastTradeDate: string | null | number = new Date(0).getTime() * 1000
+  let claimedRevenueEth: number = 0
+  let claimedRevenueUsdc: number = 0
+  let unClaimedRevenueEth: number = 0
+  let unClaimedRevenueUsdc: number = 0
+  let totalRevenueEth: number = 0
+  let totalRevenueUsdc: number = 0
+  let totalClaimedRevenue: number = 0
+  let totalUnClaimedRevenue: number = 0
+  let totalRevenue: number = 0
+  let capStaked: number = 0
   onMount(async () => {
     let url = window.location.href.split('/')
     user = url[url.length - 1]
@@ -69,11 +80,12 @@
       return;
     }
     user = user.toLocaleLowerCase();
-    [positions, orders, history, userStats] = await Promise.all([
+    [positions, orders, history, userStats, unclaimedRewards] = await Promise.all([
       await getUserPositions(user),
       await getUserOpenOrders(user),
       await getUserHistory(user),
       await getUserStats(user),
+      await getUnclaimedStakingRewards(user)
     ])
     calculateUPLs(positions, $prices)
     orders = addDollarInfoToData(orders, $prices)
@@ -105,15 +117,24 @@
       totalStakingFees = Number(((userStats.stakingFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.stakingFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
       totalTreasuryFees = Number(((userStats.treasuryFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.treasuryFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
       totalKeeperFees = Number(((userStats.keeperFeesEth * $prices['ETH-USD'][0] / getPriceDenominator(ETH)) + (userStats.keeperFeesUsdc / getPriceDenominator(USDC))).toFixed(1))
+      claimedRevenueEth = Number(((userStats.stakingRevenueEth/ getPriceDenominator(ETH))).toFixed(1))
+      claimedRevenueUsdc = Number((userStats.stakingRevenueUsdc / getPriceDenominator(USDC)).toFixed(1))
+      unClaimedRevenueEth = Number(((unclaimedRewards.eth/ getPriceDenominator(ETH))).toFixed(1))
+      unClaimedRevenueUsdc = Number((unclaimedRewards.usdc / getPriceDenominator(USDC)).toFixed(1))
+      totalRevenueEth = Number((claimedRevenueEth + unClaimedRevenueEth).toFixed(1))
+      totalRevenueUsdc = Number((claimedRevenueUsdc + unClaimedRevenueUsdc).toFixed(1))
+      totalClaimedRevenue = Number((claimedRevenueEth * $prices['ETH-USD'][0] + claimedRevenueUsdc).toFixed(1))
+      totalUnClaimedRevenue = Number((unClaimedRevenueEth * $prices['ETH-USD'][0] + unClaimedRevenueUsdc).toFixed(1))
+      totalRevenue = Number((totalClaimedRevenue + totalUnClaimedRevenue).toFixed(1))
+      capStaked = Number(((userStats.capStaked / getPriceDenominator(ETH))).toFixed(1))
     }
-
 
     for (let row of history) {
       if (row.blockTimestamp > lastTradeDate!) lastTradeDate = row.blockTimestamp
       if (row.blockTimestamp < firstTradeDate!) firstTradeDate = row.blockTimestamp
     }
-    firstTradeDate = new Date(firstTradeDate * 1000).toDateString().slice(3) + ' ' + new Date(firstTradeDate * 1000).toLocaleTimeString()
-    lastTradeDate = new Date(lastTradeDate * 1000).toDateString().slice(3) + ' ' + new Date(lastTradeDate * 1000).toLocaleTimeString()
+    firstTradeDate = firstTradeDate && new Date(firstTradeDate * 1000).toDateString().slice(3) + ' ' + new Date(firstTradeDate * 1000).toLocaleTimeString()
+    lastTradeDate = lastTradeDate && new Date(lastTradeDate * 1000).toDateString().slice(3) + ' ' + new Date(lastTradeDate * 1000).toLocaleTimeString()
 
     for (let position of positions) {
       if (position.asset == ETH) {
@@ -129,7 +150,7 @@
     totalUPL = Number(totalUPL.toFixed(1))
     loading = false
   })
-  
+
   $: dataSwitch = () => {
     switch (activeTab) {
       case 'positions':
@@ -182,11 +203,14 @@
         {/if}
       </div>
       <div class='last-trade-info'>
-        {#if lastTradeDate == null}
+        {#if firstTradeDate == null}
           {''}
         {:else}
           Last traded on CAP on <span class="white">{lastTradeDate}</span>
         {/if}
+      </div>
+      <div class='last-trade-info'>
+        Has Staked <span class='green'>{capStaked} CAP</span>
       </div>
       <div class='stats-container'>
         <div class="stats">
@@ -245,6 +269,25 @@
             </div>
             <span class:pos={uplEth > 0} class:neg={uplEth < 0}>Ξ{numberWithCommas(uplEth)}</span>
           </div>
+          <h3 class="heading"></h3>
+          <div class="data-row">
+            <div class="label">
+              Unclaimed Reward
+            </div>
+            <span class:pos={unClaimedRevenueEth > 0} class:neg={unClaimedRevenueEth < 0}>Ξ{numberWithCommas(unClaimedRevenueEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Claimed Reward
+            </div>
+            <span class:pos={claimedRevenueEth > 0} class:neg={claimedRevenueEth < 0}>Ξ{numberWithCommas(claimedRevenueEth)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Reward
+            </div>
+            <span class:pos={totalRevenueEth > 0} class:neg={totalRevenueEth < 0}>Ξ{numberWithCommas(totalRevenueEth)}</span>
+          </div>
         </div>
         <div class="stats">
           <div class={"eth head"}><img src={usdcSvg} class='coin-icon'/></div>
@@ -302,6 +345,25 @@
             </div>
             <span class:pos={uplUsdc > 0} class:neg={uplUsdc < 0}>${numberWithCommas(uplUsdc)}</span>
           </div>
+          <h3 class="heading"></h3>
+          <div class="data-row">
+            <div class="label">
+              Unclaimed Reward
+            </div>
+            <span class:pos={unClaimedRevenueUsdc > 0} class:neg={unClaimedRevenueUsdc < 0}>${numberWithCommas(unClaimedRevenueUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Claimed Reward
+            </div>
+            <span class:pos={claimedRevenueUsdc > 0} class:neg={claimedRevenueUsdc < 0}>${numberWithCommas(claimedRevenueUsdc)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Reward
+            </div>
+            <span class:pos={totalRevenueUsdc > 0} class:neg={totalRevenueUsdc < 0}>${numberWithCommas(totalRevenueUsdc)}</span>
+          </div>
         </div>
         <div class="stats">
           <div class={"white head"}><img src={ethSvg} class='coin-icon'/> + <img src={usdcSvg} class='coin-icon'/></div>
@@ -358,6 +420,25 @@
               UPL
             </div> 
             <span class:pos={totalUPL > 0} class:neg={totalUPL < 0}>${numberWithCommas(totalUPL)}</span>
+          </div>
+          <h3 class="heading"></h3>
+          <div class="data-row">
+            <div class="label">
+              Unclaimed Reward
+            </div>
+            <span class:pos={totalUnClaimedRevenue > 0} class:neg={totalUnClaimedRevenue < 0}>${numberWithCommas(totalUnClaimedRevenue)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Claimed Reward
+            </div>
+            <span class:pos={totalClaimedRevenue > 0} class:neg={totalClaimedRevenue < 0}>${numberWithCommas(totalClaimedRevenue)}</span>
+          </div>
+          <div class="data-row">
+            <div class="label">
+              Total Reward
+            </div>
+            <span class:pos={totalRevenue > 0} class:neg={totalRevenue < 0}>${numberWithCommas(totalRevenue)}</span>
           </div>
         </div>
       </div>
@@ -526,5 +607,12 @@
   }
   .yellow {
     color: yellow
+  }
+  .green {
+    color: green;
+  }
+  h3.heading {
+    margin: 10px 0;
+    border-top: 1px dashed green;
   }
 </style>

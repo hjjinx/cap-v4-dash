@@ -23,8 +23,12 @@
   let cumYTicks: any[] = [];
   let maxCumY: any = 0;
   let minCumY: any = 0;
+  $: includeFee = true;
 
-  onMount(async () => {
+  $: calculatePoints = async () => {
+    points = [];
+    pointsCum = [];
+    xValues = [];
     ETHPrice = $prices['ETH-USD'][0]
     let lastTimestamp = data[data.length - 1].blockTimestamp;
     points.push({ x: lastTimestamp * 1000, y: 0 });
@@ -32,7 +36,6 @@
     xValues.push(lastTimestamp * 1000);
     for (let e = data.length - 1; e >= 0; e--) {
       const element = data[e];
-      if (!(element.type == "Position Liquidated" || element.type == "Position Decreased")) continue;
       if (timeConverter(element.blockTimestamp * 1000) != timeConverter(lastTimestamp * 1000)) {
         lastTimestamp = element.blockTimestamp;
         points.push({ x: lastTimestamp * 1000, y: 0, ...element });
@@ -41,13 +44,13 @@
         pointsCum[pointsCum.length - 1].y += points[points.length - 2].y + pointsCum[pointsCum.length - 2].y;
       }
       
-      let thisPnl = priceFormatter(element.type == "Position Liquidated" ? (-1 * element.margin) : element.pnl, element.asset);
+      let thisPnl = priceFormatter(element.type == "Position Liquidated" ? (-1 * element.margin) : (element.pnl - (includeFee && element.fee)), element.asset);
       if (element.asset == ETH) {
         thisPnl = ETHPrice * thisPnl;
       }
       points[points.length - 1].y += thisPnl;
     }
-    pointsCum.push({ x: lastTimestamp, y: points[points.length - 1].y + pointsCum[pointsCum.length - 1].y });
+    pointsCum.push({ x: new Date().getTime(), y: points[points.length - 1].y + pointsCum[pointsCum.length - 1].y });
 
     const maxY = Math.max(...points.map((i) => i.y));
     maxCumY = Math.max(...pointsCum.map((i) => i.y));
@@ -71,7 +74,8 @@
       );
     }
     loading = false;
-  });
+  }
+  onMount(() => calculatePoints());
 
   const padding = { top: 20, right: 15, bottom: 20, left: 25 };
 
@@ -95,6 +99,10 @@
 
   $: xHover = null as any;
   $: barHover = null as any;
+  function handleCheckboxChange() {
+    includeFee = !includeFee;
+    calculatePoints();
+  }
 </script>
 
 {#if loading}
@@ -106,18 +114,18 @@
   </div>
 {:else}
   {#if !xHover}
-    <h3>Trader's PNL</h3>
+    <h3>Trader's PNL<br><input type='checkbox' checked={includeFee} on:change={handleCheckboxChange}> Consider Fee (est.)</h3>
   {:else if barHover}
     <h3>
       <span class={barHover.y > 0 ? 'pos' : 'neg'}
         >${numberWithCommas(Math.round(barHover.y))}</span
-      >
+      ><br><input type='checkbox' checked={includeFee} on:change={handleCheckboxChange}> Consider Fee (est.)
     </h3>
   {:else}
     <h3>
       <span class={xHover.y > 0 ? 'pos' : 'neg'}
         >${numberWithCommas(Math.round(xHover.y))}</span
-      >
+      ><br><input type='checkbox' checked={includeFee} on:change={handleCheckboxChange}> Consider Fee (est.)
     </h3>
   {/if}
   <div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
