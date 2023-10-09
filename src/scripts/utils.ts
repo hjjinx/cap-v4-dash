@@ -9,6 +9,7 @@ import Home from '../routes/Home.svelte';
 import Positions from '../routes/Positions.svelte';
 import User from '../routes/User.svelte';
 import Leaderboard from '../routes/Leaderboard.svelte';
+import Staking from "../routes/Staking.svelte";
 
 export function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -157,6 +158,8 @@ export function loadRoute(path: string) {
     component.set(Leaderboard);
   } else if (path.includes("/user")) {
     component.set(User);
+  } else if (path.includes("/staking")) {
+    component.set(Staking);
   }
 }
 

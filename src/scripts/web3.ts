@@ -1,9 +1,13 @@
 import { PUBLIC_INFURA_KEY } from '$env/static/public'
 import { PUBLIC_GRAPH_KEY } from '$env/static/public'
-import { PositionStore as PositionStoreABI, OrderStore as OrderStoreABI } from './abis.js'
+import { 
+  PositionStore as PositionStoreABI, 
+  OrderStore as OrderStoreABI,
+  Staking as StakingABI,
+} from './abis.js'
 import Web3 from 'web3'
 import { getPriceDenominator } from './utils.js';
-import { ETH } from './constants.js';
+import { ETH, USDC } from './constants.js';
 
 const web3Mainnet = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${PUBLIC_INFURA_KEY}`));
 const web3 = new Web3(new Web3.providers.HttpProvider(`https://arbitrum-mainnet.infura.io/v3/${PUBLIC_INFURA_KEY}`));
@@ -14,8 +18,11 @@ const PositionStoreContract = new web3.eth.Contract(PositionStoreABI, PositionSt
 const OrderStoreContractAdd = '0xF75eFA4CB21529489877566ffE68229ffF89f456';
 const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContractAdd);
 
-const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.2.8'
-// const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
+const StakingContractAdd = '0x41dC0EA026cf7f54BEA6053E3E9188Fc4831d254';
+const StakingContract = new web3.eth.Contract(StakingABI, StakingContractAdd);
+
+// const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.2.10'
+const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
 
 export const getPositions = async () => {
   let positions = await PositionStoreContract.methods.getPositions(10000, 0).call((error: any) => {
@@ -53,6 +60,20 @@ export const getUserOpenOrders = async (address: string) => {
     }
   });
   return orders
+}
+
+export const getUnclaimedStakingRewards = async (address: string) => {
+  let ethReward = await StakingContract.methods.getClaimableReward(ETH, address).call((error: any) => {
+    if (error) {
+      console.error(error);
+    }
+  });
+  let usdcReward = await StakingContract.methods.getClaimableReward(USDC, address).call((error: any) => {
+    if (error) {
+      console.error(error);
+    }
+  });
+  return {eth: ethReward, usdc: usdcReward}
 }
 
 export const getUserHistory = async (address: string) => {
@@ -142,6 +163,9 @@ export const getUserStats = async (address: string) => {
                 stakingFeesUsdc
                 treasuryFeesUsdc
                 keeperFeesUsdc
+                stakingRevenueEth
+                stakingRevenueUsdc
+                capStaked
               }
             }
           `,
@@ -172,6 +196,7 @@ export const getUsers = async () => {
               orderBy: id
               orderDirection: asc
               subgraphError: deny
+              where: {lastTradedOn_gte: 1}
             ) {
               id
               numOrdersEth
@@ -199,6 +224,45 @@ export const getUsers = async () => {
               lastTradedOn
             }
           }
+          `,
+      }),
+    }).then(res => res.json())
+    users.push(..._users?.data?.users)
+    if (_users?.data?.users?.length == 1000) {
+      skipped += 1000
+      await call(skipped)
+    }
+  }
+  await call(skipped)
+  return users;  
+}
+
+export const getRewards = async () => {
+  let users: any[] = []
+  let skipped = 0
+  const call = async (skip: number) => {
+    let _users = await fetch(GRAPH, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+              users(
+                skip: ${skip}
+                first: 1000
+                orderBy: id
+                orderDirection: asc
+                subgraphError: deny
+                where: {capStaked_gte: 1}
+              ) {
+                id
+                stakingRevenueEth
+                stakingRevenueUsdc
+                capStaked
+              }
+            }
           `,
       }),
     }).then(res => res.json())
