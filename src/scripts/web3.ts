@@ -21,8 +21,8 @@ const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContra
 const StakingContractAdd = '0x41dC0EA026cf7f54BEA6053E3E9188Fc4831d254';
 const StakingContract = new web3.eth.Contract(StakingABI, StakingContractAdd);
 
-// const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.2.10'
-const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
+const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.2.11'
+// const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
 
 export const getPositions = async () => {
   let positions = await PositionStoreContract.methods.getPositions(10000, 0).call((error: any) => {
