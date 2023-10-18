@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { prices } from "../scripts/stores";
   import { numberWithCommas } from "../scripts/utils";
-  import { getRewards } from "../scripts/web3";
+  import { getRewards, getStakingFeeShare, getTotalCapStaked } from "../scripts/web3";
   import { SPINNER_ICON } from "../scripts/icons";
   import { ETH_PRICE_DENOMINATOR, USDC_PRICE_DENOMINATOR } from "../scripts/constants";
 
@@ -11,7 +11,14 @@
   let loading: boolean;
   let sortBy: string = 'id';
   let sortOrder = 'desc';
+  $: totalCapStaked = 0;
+  $: volumePerDay = 50;
+  $: capStaked = 100;
+  $: stakingFeeShare = 0;
+  $: earningsPerDay = ((volumePerDay * 10**6) * 0.06 * 0.01 * (stakingFeeShare * 0.01 * 0.01) * (capStaked / totalCapStaked)).toFixed(2);
   onMount(async () => {
+    totalCapStaked = await getTotalCapStaked();
+    stakingFeeShare = await getStakingFeeShare();
     data = await getRewards()
     for (const user of data) {
       user.stakingRevenueEth = Number((+user.stakingRevenueEth / ETH_PRICE_DENOMINATOR).toFixed(3))
@@ -45,6 +52,13 @@
     <center><h1 class="loading-title">Fetching Sorted Data</h1></center>
   </div>
 {:else}
+  <div class='top-bar'>
+    <div class='top-text'>
+      Assuming a volume of $<input type='number' bind:value={volumePerDay} class='inline-input' min={0} max={999} style="width: 50px"> M /day 
+      and you staking <input type='number' bind:value={capStaked} class='inline-input' min={0} max={9999}> CAP, 
+      you will make ${numberWithCommas(+earningsPerDay)} /day (${numberWithCommas(+(+earningsPerDay * 365).toFixed(2))} /year).
+    </div>
+  </div>
   <div class="positions-container">
     <div class="history">
       <div class="columns">
@@ -158,5 +172,35 @@
   }
   .column-claimed {
     width: 20%;
+  }
+  .top-bar {
+    padding: 10px;
+  }
+  .top-text {
+    color: white;
+    text-align: center;
+    padding: 20px;
+    background: var(--eerie-black);
+  }
+  .inline-input {
+    background: var(--eerie-black);
+    color: var(--green);
+    outline: none;
+    border: none;
+    max-width: fit-content;
+    padding: 0 0 0 5px;
+    width: 60px;
+  }
+  input[type="number"] {
+    /* Always display the up and down arrows */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    /* Custom styles for the arrows */
+    opacity: 1;
+    height: auto;
+    background-color: var(--green);
   }
 </style>

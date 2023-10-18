@@ -4,10 +4,11 @@ import {
   PositionStore as PositionStoreABI, 
   OrderStore as OrderStoreABI,
   Staking as StakingABI,
+  StakingStore as StakingStoreABI,
 } from './abis.js'
 import Web3 from 'web3'
 import { getPriceDenominator } from './utils.js';
-import { ETH, USDC } from './constants.js';
+import { ETH, ETH_PRICE_DENOMINATOR, USDC } from './constants.js';
 
 const web3Mainnet = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${PUBLIC_INFURA_KEY}`));
 const web3 = new Web3(new Web3.providers.HttpProvider(`https://arbitrum-mainnet.infura.io/v3/${PUBLIC_INFURA_KEY}`));
@@ -20,6 +21,9 @@ const OrderStoreContract = new web3.eth.Contract(OrderStoreABI, OrderStoreContra
 
 const StakingContractAdd = '0x41dC0EA026cf7f54BEA6053E3E9188Fc4831d254';
 const StakingContract = new web3.eth.Contract(StakingABI, StakingContractAdd);
+
+const StakingStoreContractAdd = '0x02dc07c11f5260b1D38A3645DcF315C14A8391D1';
+const StakingStoreContract = new web3.eth.Contract(StakingStoreABI, StakingStoreContractAdd);
 
 const GRAPH = 'https://api.studio.thegraph.com/query/43986/cap/0.2.11'
 // const GRAPH = `https://gateway-arbitrum.network.thegraph.com/api/${PUBLIC_GRAPH_KEY}/subgraphs/id/ASonuQLUtjM7UPVyjGh5erZtBByBY2UDFiTBUnoUpmU4`
@@ -74,6 +78,23 @@ export const getUnclaimedStakingRewards = async (address: string) => {
     }
   });
   return {eth: ethReward, usdc: usdcReward}
+}
+
+export const getTotalCapStaked = async () => {
+  let totalCapStaked = await StakingStoreContract.methods.getTotalSupply().call((error: any) => {
+    if (error) {
+      console.error(error);
+    }
+  });
+  return totalCapStaked / ETH_PRICE_DENOMINATOR;
+}
+export const getStakingFeeShare = async () => {
+  let stakingFeeShare = await StakingStoreContract.methods.feeShare().call((error: any) => {
+    if (error) {
+      console.error(error);
+    }
+  });
+  return stakingFeeShare;
 }
 
 export const getUserHistory = async (address: string) => {
