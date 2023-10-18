@@ -214,8 +214,8 @@ export const getUsers = async () => {
               users(
               skip: ${skip}
               first: 1000
-              orderBy: id
-              orderDirection: asc
+              orderBy: lastTradedOn
+              orderDirection: desc
               subgraphError: deny
               where: {lastTradedOn_gte: 1}
             ) {
@@ -273,8 +273,8 @@ export const getRewards = async () => {
               users(
                 skip: ${skip}
                 first: 1000
-                orderBy: id
-                orderDirection: asc
+                orderBy: capStaked
+                orderDirection: desc
                 subgraphError: deny
                 where: {capStaked_gte: 1}
               ) {

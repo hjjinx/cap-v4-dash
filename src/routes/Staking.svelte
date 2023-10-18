@@ -9,7 +9,7 @@
 
   let data: any[] = [];
   let loading: boolean;
-  let sortBy: string = 'id';
+  let sortBy: string = 'capStaked';
   let sortOrder = 'desc';
   $: totalCapStaked = 0;
   $: volumePerDay = 50;

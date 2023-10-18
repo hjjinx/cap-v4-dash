@@ -10,7 +10,7 @@
 
   let data: any[] = [];
   let loading: boolean;
-  let sortBy: string = 'id';
+  let sortBy: string = 'lastTradedOn';
   let sortOrder = 'desc';
   onMount(async () => {
     data = await getUsers()
