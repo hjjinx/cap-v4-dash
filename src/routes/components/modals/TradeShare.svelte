@@ -95,8 +95,8 @@
         <div class="position-container">
           <p class="white-large">
             {data.market}
-            <span class={data.isLong ? "primary" : "secondary"}
-              >{data.isLong ? "Long" : "Short"}</span
+            <span class={data.isClose ? (data.isLong ? "secondary" : "primary") : (data.isLong ? "primary" : "secondary")}
+              >{data.isClose ? (data.isLong ? "Short" : "Long") : (data.isLong ? "Long" : "Short")}</span
             >
           </p>
           <p class={pnl > 0 ? "position-profit" : "position-profit loss"}>
