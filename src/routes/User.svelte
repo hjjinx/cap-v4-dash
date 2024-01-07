@@ -48,7 +48,7 @@
   let uplEth = 0;
   let uplUsdc = 0;
   let totalUPL = 0;
-  let firstTradeDate: string | null | number = null
+  let firstTradeDate: string | null | number = Infinity
   let lastTradeDate: string | null | number = new Date(0).getTime() * 1000
   let claimedRevenueEth: number = 0
   let claimedRevenueUsdc: number = 0
